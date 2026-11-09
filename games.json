@@ -1,4 +1,18 @@
+
 {
   "schema": 1,
-  "games": []
+  "games": [
+    {
+      "id": "ants",
+      "title": "Ants",
+      "category": "Aventura",
+      "version": "1.5",
+      "description": "Jogo de formiga",
+      "emoji": "🐜",
+      "color": "linear-gradient(135deg,#55458f,#262d4c)",
+      "url": "games/ants/Formigueiro%20(2).HTML",
+      "mode": "html",
+      "createdAt": "2026-11-09"
+    }
+  ]
 }
