@@ -45,6 +45,17 @@
       "url": "games/mercadinho/index.html",
       "mode": "html",
       "createdAt": "2026-11-10"
+    },
+    {
+      "id": "roube-minerio",
+      "title": "Roube um Minério",
+      "category": "Aventura",
+      "version": "1.0",
+      "description": "Colete e roube minérios valiosos!",
+      "emoji": "💎",
+      "url": "games/roube_um_minerio/index.html",
+      "mode": "html",
+      "createdAt": "2026-11-10"
     }
   ]
 }
