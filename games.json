@@ -30,7 +30,7 @@
       "version": "1.0",
       "description": "Explore um museu, descubra dinossauros, objetos antigos e relíquias históricas. Conheça também Carlos Eduardo!",
       "emoji": "🦖",
-      "url": "games/museugrok/index.html"
+      "url": "games/museugrok/index.html",
       "mode": "html",
       "createdAt": "2026-11-10"
     }
