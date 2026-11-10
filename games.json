@@ -1,3 +1,4 @@
+
 {
   "schema": 1,
   "games": [
@@ -31,6 +32,17 @@
       "description": "Explore um museu, descubra dinossauros, objetos antigos e relíquias históricas. Conheça também Carlos Eduardo!",
       "emoji": "🦖",
       "url": "games/museugrok/index.html",
+      "mode": "html",
+      "createdAt": "2026-11-10"
+    },
+    {
+      "id": "mercadinho",
+      "title": "Supermercado 2D",
+      "category": "Simulação",
+      "version": "1.0",
+      "description": "Administre seu próprio supermercado!",
+      "emoji": "🛒",
+      "url": "games/mercadinho/index.html",
       "mode": "html",
       "createdAt": "2026-11-10"
     }
