@@ -1,6 +1,4 @@
-
-{
-  "schema": 1,
+schema": 1,
   "games": [
     {
       "id": "ants",
