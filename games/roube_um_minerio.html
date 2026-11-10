@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#101923">
+<title>Roube um Minério</title>
+<style>
+:root{--bg:#101923;--panel:#192633;--panel2:#223343;--line:#314657;--text:#f2f7fb;--muted:#a8bac8;--green:#61df9a;--gold:#ffc85c;--red:#ff7777;--blue:#70c7ff;--shadow:0 12px 30px #0005}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1a3141 0,#101923 55%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}button{font:inherit;cursor:pointer;border:0;color:var(--text);border-radius:12px;padding:10px 13px;font-weight:800;transition:transform .12s,filter .12s}button:active{transform:scale(.97)}button:disabled{opacity:.42;cursor:not-allowed;filter:grayscale(.5)}.app{max-width:1250px;margin:auto;padding:16px}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}.brand{display:flex;align-items:center;gap:12px}.logo{height:54px;width:54px;border-radius:16px;background:linear-gradient(145deg,#e5a83f,#986222);display:grid;place-items:center;font-size:30px;box-shadow:var(--shadow)}h1{font-size:clamp(22px,4vw,32px);margin:0;letter-spacing:-.8px}.subtitle{color:var(--muted);font-size:12px}.wallet{display:flex;gap:9px;flex-wrap:wrap}.stat{background:#172531;border:1px solid var(--line);padding:10px 14px;border-radius:14px;min-width:120px}.stat small{display:block;color:var(--muted);font-size:11px}.stat strong{font-size:17px;color:var(--green);font-variant-numeric:tabular-nums}.stat:nth-child(2) strong{color:var(--gold)}.stat:nth-child(3) strong{color:var(--blue)}.nav{display:flex;gap:8px;overflow-x:auto;padding:4px 1px 12px;margin-bottom:4px}.nav button{white-space:nowrap;background:#233646;color:#c6d4de;border:1px solid #344b5d}.nav button.active{background:linear-gradient(135deg,#258c69,#176a55);border-color:#54d49c;color:white}.panel{background:linear-gradient(155deg,#1c2c39,#17232e);border:1px solid var(--line);border-radius:19px;padding:17px;box-shadow:var(--shadow);margin-bottom:14px}.panel h2{font-size:20px;margin:0 0 5px}.muted{color:var(--muted)}.section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:15px}.tiny{font-size:12px;color:var(--muted)}.belt{display:flex;gap:12px;overflow-x:auto;padding:5px 2px 13px;scrollbar-width:thin}.ore-card{flex:0 0 176px;background:linear-gradient(160deg,#263b4b,#1a2a37);border:1px solid #3b5366;border-radius:16px;padding:13px;min-height:206px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative}.ore-icon{font-size:42px;line-height:1.2;margin:6px}.ore-name{font-weight:900;font-size:14px}.rarity{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;margin:5px 0}.price{font-size:14px;color:var(--gold);font-weight:900}.income{font-size:12px;color:var(--green);margin:3px 0 10px}.buy{background:linear-gradient(135deg,#26986a,#16724e);width:100%;margin-top:auto}.empty-belt{padding:28px;text-align:center;color:var(--muted);width:100%}.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.slot{min-height:142px;border:1px dashed #496174;background:#14212c;border-radius:15px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative}.slot.filled{border-style:solid;background:linear-gradient(150deg,#263c4c,#1a2a36)}.slot-num{position:absolute;top:7px;left:9px;color:#8da4b5;font-size:10px}.slot .ore-icon{font-size:31px;margin:4px}.slot .ore-name{font-size:12px}.slot .income{margin:3px 0 7px;font-size:11px}.slot-actions{display:flex;gap:5px;width:100%;margin-top:auto}.slot-actions button{font-size:10px;padding:7px 4px;flex:1}.sell{background:#8b4147}.slot-empty{font-size:12px;color:#71899b}.base-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.bot{border:1px solid #3a5264;background:linear-gradient(145deg,#243949,#1a2a36);padding:14px;border-radius:16px}.bot-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.bot-name{font-weight:900}.bot-label{font-size:10px;color:#b8c9d5;background:#354b5c;padding:5px 8px;border-radius:20px}.bot-slots{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.bot-slot{background:#14222c;border:1px solid #354b5a;border-radius:10px;min-height:85px;padding:6px 3px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.bot-slot .ore-icon{font-size:24px;margin:2px}.bot-slot .ore-name{font-size:9px;line-height:1.1}.bot-slot button{font-size:9px;padding:5px 3px;margin-top:5px;background:#9b6831;width:95%}.bot-empty{color:#6f8291;font-size:10px}.refresh-line{display:flex;align-items:center;gap:8px;color:var(--gold);font-weight:800;font-size:13px}.pill{background:#253b4b;padding:6px 10px;border-radius:30px;font-size:11px;color:#d5e2eb}.rebirths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.rebirth-card{border:1px solid #40586a;border-radius:16px;padding:15px;background:linear-gradient(145deg,#263d4d,#1a2935)}.rebirth-card.done{border-color:#3bbd83;background:linear-gradient(145deg,#1d493c,#1a302f)}.rebirth-card h3{margin:0 0 7px}.rebirth-card p{font-size:12px;color:var(--muted);min-height:34px}.rebirth-card .req{font-size:13px;color:var(--gold);font-weight:900;margin:9px 0}.rebirth-card button{width:100%;background:linear-gradient(135deg,#b57b2e,#85531d)}.rebirth-card.done button{background:#267a59}.feed{display:flex;flex-direction:column;gap:6px;max-height:155px;overflow:auto}.feed-item{padding:8px 10px;border-radius:9px;background:#14212b;font-size:12px;color:#c3d1dc}.feed-item b{color:var(--green)}.footer{color:#7890a2;text-align:center;font-size:11px;padding:12px 0 5px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:#f1f7fb;color:#14222d;padding:12px 17px;border-radius:12px;font-weight:900;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s;z-index:5;max-width:92vw;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.hidden{display:none!important}.tag{display:inline-block;padding:4px 8px;border-radius:20px;background:#233a49;color:#a9c2d4;font-size:10px;font-weight:800}.green{color:var(--green)}.gold{color:var(--gold)}.warning{color:#ffb4a8}.two-col{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.info-list{display:grid;gap:8px}.info-row{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #304352;padding:7px 0;font-size:13px}.reset-btn{background:#4b3540;border:1px solid #80515d;font-size:11px;padding:7px 10px}.notice{border-left:3px solid var(--gold);background:#2c2a25;padding:10px 12px;border-radius:8px;color:#e6d5b4;font-size:12px;margin-top:12px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.two-col{grid-template-columns:1fr}.base-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.app{padding:10px}.top{align-items:flex-start}.wallet{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}.stat{min-width:0;padding:8px}.stat strong{font-size:14px}.stat small{font-size:10px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.slot{min-height:137px;padding:8px 5px}.rebirths{grid-template-columns:1fr}.panel{padding:13px}.bot-slots{grid-template-columns:repeat(5,minmax(0,1fr))}.bot-slot{min-height:78px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">⛏️</div><div><h1>ROUBE UM MINÉRIO</h1><div class="subtitle">Colecione, venda, roube e fique milionário!</div></div></div>
+    <div class="wallet">
+      <div class="stat"><small>SEU DINHEIRO</small><strong id="money">R$ 500</strong></div>
+      <div class="stat"><small>GANHOS POR SEGUNDO</small><strong id="income">R$ 0/s</strong></div>
+      <div class="stat"><small>MULTIPLICADOR</small><strong id="multiplier">1,00x</strong></div>
+    </div>
+  </header>
+
+  <nav class="nav" aria-label="Menu do jogo">
+    <button class="active" data-tab="belt">🛒 Esteira</button>
+    <button data-tab="base">🏠 Minha base <span id="baseCount">0/10</span></button>
+    <button data-tab="steal">🥷 Roubar bases</button>
+    <button data-tab="index">📚 Index</button>
+    <button data-tab="rebirth">🔄 Rebirths</button>
+    <button data-tab="stats">📊 Estatísticas</button>
+  </nav>
+
+  <main>
+    <section id="tab-belt" class="tab">
+      <div class="panel">
+        <div class="section-head"><div><h2>🛒 Esteira de minérios</h2><div class="tiny">A esteira funciona independentemente da sua base: continua recebendo minérios mesmo quando seus espaços estão cheios.</div></div><span class="pill" id="beltStatus">Próximo minério em 6s</span></div>
+        <div id="adminEventBanner" class="notice" style="margin:0 0 12px;border-left-color:#dc9aff">🛠️ <b>ADMIN ABUSE</b> — <span id="adminEventStatus">Começa hoje às 21:05 e termina às 21:20.</span></div>
+        <div id="belt" class="belt"></div>
+        <div class="tiny" id="beltCapacityNote">A esteira normal guarda até 8 minérios. Durante o Admin Abuse, ela terá 20 espaços.</div>
+      </div>
+      <div class="two-col">
+        <div class="panel"><h2>🎯 Como jogar</h2><div class="info-list"><div class="info-row"><span>1. Compre na esteira</span><b class="green">Encha sua base</b></div><div class="info-row"><span>2. Ganhe dinheiro</span><b class="green">Automaticamente</b></div><div class="info-row"><span>3. Visite outras bases</span><b class="gold">Roube minérios</b></div><div class="info-row"><span>4. Faça rebirth</span><b class="gold">Fique mais forte</b></div></div></div>
+        <div class="panel"><h2>✨ Chances da esteira</h2><div class="info-list" id="chanceList"></div><div class="tiny" style="margin-top:8px">No Admin Abuse, cada raridade recebe +0,25 ponto percentual no peso exibido. Como a soma passa de 100% (e existe a raridade Secret), o sorteio normaliza os pesos proporcionalmente para fechar 100%.</div></div>
+      </div>
+    </section>
+
+    <section id="tab-base" class="tab hidden">
+      <div class="panel"><div class="section-head"><div><h2>🏠 Sua base</h2><div class="tiny">Você começa com 10 espaços. Cada rebirth libera +1 espaço permanente.</div></div><span class="pill" id="baseCountLarge">0 de 10 espaços</span></div><div id="myBase" class="grid"></div><div class="section-head" style="margin:16px 0 0"><div><b>Renda total da base</b><div class="tiny">O multiplicador dos rebirths aumenta seus ganhos.</div></div><strong class="green" id="baseIncome">R$ 0/s</strong></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button id="sellAll" class="sell">💰 Vender todos os minérios</button><button id="collectInfo" class="pill" style="border:0">Renda cai automaticamente na carteira</button></div></div>
+    </section>
+
+    <section id="tab-steal" class="tab hidden">
+      <div class="panel"><div class="section-head"><div><h2>🥷 Bases de outros jogadores</h2><div class="tiny">São bases simuladas pelo jogo, não de pessoas reais. Pegue os minérios que encontrar!</div></div><div class="refresh-line">🔄 Atualizam em <span id="refreshTimer">05:00</span></div></div><div id="botBases" class="base-grid"></div><div class="notice">As bases são renovadas automaticamente a cada 5 minutos. Quando você rouba um minério, aquele espaço fica vazio até a próxima renovação. No Admin Abuse, as bases recebem uma seleção com mais chances de minérios raros, mas nenhum minério específico é garantido. Você precisa ter espaço livre na sua base para roubar.</div></div>
+    </section>
+
+    <section id="tab-index" class="tab hidden">
+      <div class="panel"><div class="section-head"><div><h2>📚 Index de minérios</h2><div class="tiny">Todos os minérios do jogo. O Index registra cada minério que você comprar ou roubar.</div></div><span class="pill" id="indexProgress">0/13 descobertos</span></div><div id="indexGrid" class="grid"></div><div class="notice" id="indexTotal">Ainda não há minérios registrados.</div></div>
+    </section>
+
+    <section id="tab-rebirth" class="tab hidden">
+      <div class="panel"><div class="section-head"><div><h2>🔄 Rebirths</h2><div class="tiny">São 3 rebirths. Cada um aumenta seus ganhos e sua velocidade.</div></div><span class="pill" id="rebirthProgress">0/3 concluídos</span></div><div id="rebirthCards" class="rebirths"></div><div class="notice">Ao fazer rebirth, seu dinheiro e os minérios da sua base são reiniciados. Você começa novamente com R$ 500, mas mantém os bônus conquistados. As bases simuladas e suas estatísticas não são apagadas.</div></div>
+    </section>
+
+    <section id="tab-stats" class="tab hidden">
+      <div class="two-col"><div class="panel"><h2>📊 Suas estatísticas</h2><div class="info-list" id="statsList"></div></div><div class="panel"><h2>📜 Atividade recente</h2><div class="feed" id="feed"></div><div style="margin-top:15px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="tiny" id="saveStatus">Salvamento automático ativo</span><button class="reset-btn" id="resetGame">Reiniciar jogo</button></div></div></div>
+    </section>
+  </main>
+  <div class="footer">Roube um Minério • Jogo de navegador • Seu progresso é salvo automaticamente neste aparelho.</div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+const SAVE_KEY = 'roube_um_minerio_save_v1';
+const START_SLOTS = 10;
+const NORMAL_BELT_LIMIT = 8;
+const EVENT_BELT_LIMIT = 20;
+const BOT_SLOT_COUNT = 10;
+const BOT_REFRESH_MS = 5 * 60 * 1000;
+const ADMIN_EVENT_START = new Date(2026, 10, 4, 21, 5, 0, 0).getTime();
+const ADMIN_EVENT_END = new Date(2026, 10, 4, 21, 20, 0, 0).getTime();
+const RARITIES = ['Comum','Raro','Épico','Lendário','Mítico','Secret'];
+const BASE_WEIGHTS = [55,30,9.5,5,.5,.05];
+const EVENT_BONUS_POINTS = .25;
+const ORES = [
+  {key:'pedra_estragada',name:'Pedra Estragada',rarity:'Comum',icon:'🪨',price:20,sell:15,income:2,color:'#c4cbd1'},
+  {key:'pedra',name:'Pedra',rarity:'Comum',icon:'🌑',price:60,sell:45,income:5,color:'#c4cbd1'},
+  {key:'cobre',name:'Cobre',rarity:'Raro',icon:'🟠',price:180,sell:135,income:12,color:'#64d4aa'},
+  {key:'carvao',name:'Carvão',rarity:'Raro',icon:'⚫',price:250,sell:188,income:18,color:'#64d4aa'},
+  {key:'chumbo',name:'Chumbo',rarity:'Raro',icon:'⬛',price:320,sell:240,income:24,color:'#64d4aa'},
+  {key:'ferro',name:'Ferro',rarity:'Épico',icon:'⚙️',price:650,sell:488,income:42,color:'#8ab8ff'},
+  {key:'tungstenio',name:'Tungstênio',rarity:'Épico',icon:'🔩',price:950,sell:713,income:65,color:'#8ab8ff'},
+  {key:'lapis_azul',name:'Lápis Azul',rarity:'Épico',icon:'🔷',price:1450,sell:1088,income:95,color:'#8ab8ff'},
+  {key:'ouro',name:'Ouro',rarity:'Lendário',icon:'🟡',price:2500,sell:1875,income:170,color:'#ffc85c'},
+  {key:'diamante',name:'Diamante',rarity:'Lendário',icon:'💎',price:5000,sell:3750,income:300,color:'#ffc85c'},
+  {key:'esmeralda',name:'Esmeralda',rarity:'Mítico',icon:'💚',price:15000,sell:11250,income:900,color:'#dc9aff'},
+  {key:'paladio',name:'Paládio',rarity:'Mítico',icon:'🔮',price:25000,sell:18750,income:1600,color:'#dc9aff'},
+  {key:'rubi',name:'Rubi',rarity:'Secret',icon:'❤️‍🔥',price:75000,sell:56250,income:4500,color:'#ff6b86'}
+];
+const BOT_NAMES = ['Minerador Zeca','Rei da Mina','PedraMaster','Magnata dos Minérios'];
+const BOT_WEIGHTS = [70,22,6,1.5,.49,.01];
+const EVENT_BOT_WEIGHTS = [55,25,11,6,2.5,.5];
+const REBIRTH_REQUIREMENTS = [50000,500000,5000000];
+const MULTIPLIERS = [1,1.5,2.25,3.5];
+const SPEEDS = [1,1.15,1.3,1.5];
+let state;
+let toastTimer = null;
+let lastRender = 0;
+
+function clone(value){return JSON.parse(JSON.stringify(value));}
+function newId(){return (Date.now().toString(36) + Math.random().toString(36).slice(2,8));}
+function oreByKey(key){return ORES.find(o=>o.key===key) || ORES[0];}
+function chooseWeighted(weights){const total=weights.reduce((a,b)=>a+b,0);let r=Math.random()*total;for(let i=0;i<weights.length;i++){r-=weights[i];if(r<0)return i;}return weights.length-1;}
+function isAdminEventActive(now=Date.now()){return now>=ADMIN_EVENT_START&&now<ADMIN_EVENT_END;}
+function baseSlotLimit(){return START_SLOTS+state.rebirths;}
+function beltLimit(now=Date.now()){return isAdminEventActive(now)?EVENT_BELT_LIMIT:NORMAL_BELT_LIMIT;}
+function weightsForEvent(base){return isAdminEventActive()?base.map(w=>w+EVENT_BONUS_POINTS):base;}
+function oresOfRarity(rarity){return ORES.filter(o=>o.rarity===rarity);}
+function makeOre(weights=null){const activeWeights=weights||weightsForEvent(BASE_WEIGHTS);const rarity=RARITIES[chooseWeighted(activeWeights)];const group=oresOfRarity(rarity);const type=group[Math.floor(Math.random()*group.length)];return {id:newId(),key:type.key};}
+function makeBotBases(){const weights=isAdminEventActive()?weightsForEvent(EVENT_BOT_WEIGHTS):BOT_WEIGHTS;return BOT_NAMES.map((name,index)=>({id:'bot'+index,name,slots:Array.from({length:BOT_SLOT_COUNT},()=>makeOre(weights))}));}
+function freshState(){return {version:2,money:500,rebirths:0,base:Array(START_SLOTS).fill(null),belt:Array.from({length:5},()=>makeOre()),bots:makeBotBases(),lastBotRefresh:Date.now(),nextSpawnAt:Date.now()+6000,lastTick:Date.now(),stats:{bought:0,stolen:0,sold:0,rebirths:0,totalEarned:0},index:{},adminEventPrepared:false,adminEventEnded:false,feed:[],createdAt:Date.now()};}
+function sanitizeOre(ore){if(!ore || typeof ore!=='object' || !ORES.some(o=>o.key===ore.key))return null;return {id:String(ore.id||newId()),key:ore.key};}
+function loadState(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);if(!raw)return freshState();
+    const data=JSON.parse(raw);if(!data || ![1,2].includes(data.version)) return freshState();
+    const clean=freshState();
+    clean.money=Number.isFinite(data.money)&&data.money>=0?data.money:500;
+    clean.rebirths=Math.max(0,Math.min(3,Math.floor(Number(data.rebirths)||0)));
+    const wantedSlots=START_SLOTS+clean.rebirths;
+    clean.base=Array.from({length:wantedSlots},(_,i)=>sanitizeOre(Array.isArray(data.base)?data.base[i]:null));
+    clean.belt=Array.isArray(data.belt)?data.belt.slice(0,EVENT_BELT_LIMIT).map(sanitizeOre).filter(Boolean):clean.belt;
+    clean.bots=Array.isArray(data.bots)&&data.bots.length===BOT_NAMES.length?data.bots.map((bot,i)=>({id:'bot'+i,name:BOT_NAMES[i],slots:Array.from({length:BOT_SLOT_COUNT},(_,j)=>sanitizeOre(bot&&Array.isArray(bot.slots)?bot.slots[j]:null))})):makeBotBases();
+    clean.lastBotRefresh=Number.isFinite(data.lastBotRefresh)?data.lastBotRefresh:Date.now();
+    clean.nextSpawnAt=Number.isFinite(data.nextSpawnAt)?data.nextSpawnAt:Date.now()+6000;
+    clean.lastTick=Number.isFinite(data.lastTick)?data.lastTick:Date.now();
+    clean.stats={...clean.stats,...(data.stats||{})};
+    clean.index=data.index&&typeof data.index==='object'?{...data.index}:{};
+    clean.adminEventPrepared=Boolean(data.adminEventPrepared);
+    clean.adminEventEnded=Boolean(data.adminEventEnded);
+    clean.feed=Array.isArray(data.feed)?data.feed.filter(x=>typeof x==='string').slice(0,20):[];
+    clean.createdAt=Number.isFinite(data.createdAt)?data.createdAt:Date.now();
+    // Migra o progresso antigo sem apagar os minérios que já estavam na base.
+    clean.base.filter(Boolean).forEach(ore=>{if(!clean.index[ore.key])clean.index[ore.key]=1;});
+    clean.version=2;
+    return clean;
+  }catch(e){console.warn('Save inválido; iniciando um novo jogo.',e);return freshState();}
+}
+function saveGame(){try{state.lastTick=Date.now();localStorage.setItem(SAVE_KEY,JSON.stringify(state));const el=document.getElementById('saveStatus');if(el)el.textContent='Salvo automaticamente ✓';}catch(e){const el=document.getElementById('saveStatus');if(el)el.textContent='Não foi possível salvar neste navegador';console.error(e);}}
+function formatMoney(n){if(!Number.isFinite(n))n=0;return 'R$ '+Math.floor(n).toLocaleString('pt-BR');}
+function formatShort(n){if(n>=1e9)return 'R$ '+(n/1e9).toFixed(2).replace('.',',')+' bi';if(n>=1e6)return 'R$ '+(n/1e6).toFixed(2).replace('.',',')+' mi';if(n>=1e4)return 'R$ '+(n/1e3).toFixed(1).replace('.',',')+' mil';return formatMoney(n);}
+function multiplier(){return MULTIPLIERS[state.rebirths]||1;}
+function speed(){return SPEEDS[state.rebirths]||1;}
+function incomePerSecond(){return state.base.reduce((sum,ore)=>sum+(ore?oreByKey(ore.key).income:0),0)*multiplier();}
+function freeSlots(){return state.base.filter(x=>!x).length;}
+function markCollected(ore){if(!ore||!ORES.some(o=>o.key===ore.key))return;state.index[ore.key]=(Number(state.index[ore.key])||0)+1;}
+function collectedTypes(){return ORES.filter(o=>(Number(state.index[o.key])||0)>0).length;}
+function displayPercent(value){return value.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%';}
+function addFeed(message){state.feed.unshift(message);state.feed=state.feed.slice(0,20);}
+function notify(message){const el=document.getElementById('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2200);}
+function rarityColor(rarity){return ({'Comum':'#c4cbd1','Raro':'#64d4aa','Épico':'#8ab8ff','Lendário':'#ffc85c','Mítico':'#dc9aff','Secret':'#ff6b86'})[rarity]||'#fff';}
+function renderOreCard(ore,index){const data=oreByKey(ore.key);const canBuy=state.money>=data.price&&freeSlots()>0;return `<article class="ore-card"><div class="tag">#${index+1} na esteira</div><div class="ore-icon">${data.icon}</div><div class="ore-name">${data.name}</div><div class="rarity" style="color:${rarityColor(data.rarity)}">${data.rarity}</div><div class="price">${formatMoney(data.price)}</div><div class="income">+${formatMoney(data.income*multiplier())}/s</div><button class="buy" data-buy="${ore.id}" ${canBuy?'':'disabled'}>Comprar</button></article>`;}
+function renderBelt(){const el=document.getElementById('belt');el.innerHTML=state.belt.length?state.belt.map(renderOreCard).join(''):'<div class="empty-belt">A esteira está vazia. Novos minérios estão chegando...</div>';el.querySelectorAll('[data-buy]').forEach(btn=>btn.addEventListener('click',()=>buyOre(btn.dataset.buy)));}
+function updateBeltButtons(){document.querySelectorAll('[data-buy]').forEach(btn=>{const ore=state.belt.find(o=>o.id===btn.dataset.buy);const data=ore?oreByKey(ore.key):null;btn.disabled=!data||state.money<data.price||freeSlots()<=0;});}
+function renderBase(){const el=document.getElementById('myBase');el.innerHTML=state.base.map((ore,index)=>{if(!ore)return `<div class="slot"><span class="slot-num">ESPAÇO ${index+1}</span><div class="ore-icon">⬜</div><div class="slot-empty">Espaço vazio</div></div>`;const data=oreByKey(ore.key);return `<div class="slot filled"><span class="slot-num">ESPAÇO ${index+1}</span><div class="ore-icon">${data.icon}</div><div class="ore-name">${data.name}</div><div class="rarity" style="color:${rarityColor(data.rarity)}">${data.rarity}</div><div class="income">+${formatMoney(data.income*multiplier())}/s</div><div class="slot-actions"><button class="sell" data-sell="${ore.id}">Vender ${formatMoney(data.sell*multiplier())}</button></div></div>`;}).join('');el.querySelectorAll('[data-sell]').forEach(btn=>btn.addEventListener('click',()=>sellOre(btn.dataset.sell)));document.getElementById('baseIncome').textContent=formatMoney(incomePerSecond())+'/s';document.getElementById('baseCountLarge').textContent=(state.base.length-freeSlots())+' de '+baseSlotLimit()+' espaços';}
+function renderIndex(){const el=document.getElementById('indexGrid');el.innerHTML=ORES.map(data=>{const count=Number(state.index[data.key])||0;return `<div class="slot ${count?'filled':''}"><div class="ore-icon">${count?data.icon:'❔'}</div><div class="ore-name">${count?data.name:'???'}</div><div class="rarity" style="color:${rarityColor(data.rarity)}">${data.rarity}</div><div class="tiny">${count?'Coletado: '+count+'x':'Ainda não descoberto'}</div></div>`;}).join('');document.getElementById('indexProgress').textContent=collectedTypes()+'/'+ORES.length+' descobertos';const total=Object.values(state.index).reduce((sum,n)=>sum+(Number(n)||0),0);document.getElementById('indexTotal').textContent='Você coletou '+total+' minério(s) no total e descobriu '+collectedTypes()+' de '+ORES.length+' tipos.';}
+function renderChances(){const names=['Comum','Raro','Épico','Lendário','Mítico','Secret'];const base=[55,30,9.5,5,.5,.05];const active=isAdminEventActive();document.getElementById('chanceList').innerHTML=names.map((name,i)=>{const value=base[i]+(active?EVENT_BONUS_POINTS:0);return `<div class="info-row"><span>${name}</span><b style="color:${rarityColor(name)}">${displayPercent(value)}${active?'*':''}</b></div>`;}).join('');}
+function renderBots(){const el=document.getElementById('botBases');el.innerHTML=state.bots.map(bot=>`<article class="bot"><div class="bot-head"><div><div class="bot-name">🏠 ${bot.name}</div><div class="tiny">Base simulada • ${BOT_SLOT_COUNT} espaços</div></div><span class="bot-label">NPC</span></div><div class="bot-slots">${bot.slots.map((ore,index)=>{if(!ore)return `<div class="bot-slot"><div class="bot-empty">Vazio</div></div>`;const data=oreByKey(ore.key);return `<div class="bot-slot"><div class="ore-icon">${data.icon}</div><div class="ore-name" style="color:${rarityColor(data.rarity)}">${data.name}</div><button data-steal="${bot.id}" data-slot="${index}" ${freeSlots()>0?'':'disabled'}>Roubar</button></div>`;}).join('')}</div></article>`).join('');el.querySelectorAll('[data-steal]').forEach(btn=>btn.addEventListener('click',()=>stealOre(btn.dataset.steal,Number(btn.dataset.slot))));}
+function renderRebirth(){const el=document.getElementById('rebirthCards');el.innerHTML=REBIRTH_REQUIREMENTS.map((req,i)=>{const done=state.rebirths>i;const current=state.rebirths===i;const nextMult=MULTIPLIERS[i+1];const nextSpeed=SPEEDS[i+1];const title=['Rebirth 1','Rebirth 2','Rebirth 3'][i];let status=done?'Concluído ✓':current?'Disponível para desbloquear':'Bloqueado';let button=done?'<button disabled>Já conquistado</button>':current?`<button data-rebirth="${i}" ${state.money>=req?'':'disabled'}>Fazer rebirth</button>`:'<button disabled>Faça o anterior primeiro</button>';return `<article class="rebirth-card ${done?'done':''}"><h3>${title} <span class="tag">${status}</span></h3><p>Mais dinheiro por segundo e esteira mais rápida.</p><div class="req">${formatMoney(req)}</div><div class="tiny">Após concluir: <b class="green">${nextMult.toFixed(2).replace('.',',')}x ganhos</b> • <b class="gold">${nextSpeed.toFixed(2).replace('.',',')}x velocidade</b></div><div style="margin-top:12px">${button}</div></article>`;}).join('');el.querySelectorAll('[data-rebirth]').forEach(btn=>btn.addEventListener('click',doRebirth));document.getElementById('rebirthProgress').textContent=state.rebirths+'/3 concluídos';}
+function renderStats(){const rows=[['Minérios comprados',state.stats.bought],['Minérios roubados',state.stats.stolen],['Minérios vendidos',state.stats.sold],['Rebirths realizados',state.stats.rebirths],['Total ganho na partida',formatShort(state.stats.totalEarned)],['Velocidade da esteira',speed().toFixed(2).replace('.',',')+'x']];document.getElementById('statsList').innerHTML=rows.map(([a,b])=>`<div class="info-row"><span>${a}</span><b>${b}</b></div>`).join('');document.getElementById('feed').innerHTML=state.feed.length?state.feed.map(x=>`<div class="feed-item">${x}</div>`).join(''):'<div class="feed-item">Sua aventura começa agora!</div>';}
+function renderHeader(){document.getElementById('money').textContent=formatShort(state.money);document.getElementById('income').textContent=formatShort(incomePerSecond())+'/s';document.getElementById('multiplier').textContent=multiplier().toFixed(2).replace('.',',')+'x';document.getElementById('baseCount').textContent=(state.base.length-freeSlots())+'/'+baseSlotLimit();}
+function renderAll(){renderHeader();renderBelt();renderBase();renderBots();renderIndex();renderChances();renderRebirth();renderStats();}
+function buyOre(id){const index=state.belt.findIndex(o=>o.id===id);if(index<0)return;const ore=state.belt[index];const data=oreByKey(ore.key);if(freeSlots()<=0){notify('Sua base está cheia! A esteira continuará recebendo minérios.');return;}if(state.money<data.price){notify('Dinheiro insuficiente!');return;}const slot=state.base.findIndex(x=>!x);if(slot<0){notify('Sua base está cheia!');return;}state.money-=data.price;state.base[slot]=ore;state.belt.splice(index,1);state.stats.bought++;markCollected(ore);addFeed(`Você comprou <b>${data.name}</b> por ${formatMoney(data.price)}.`);saveGame();renderAll();notify(data.name+' comprado!');}
+function sellOre(id){const index=state.base.findIndex(o=>o&&o.id===id);if(index<0)return;const ore=state.base[index];const data=oreByKey(ore.key);const value=data.sell*multiplier();state.money+=value;state.stats.sold++;state.stats.totalEarned+=value;state.base[index]=null;addFeed(`Você vendeu <b>${data.name}</b> por ${formatMoney(value)}.`);saveGame();renderAll();notify('Venda realizada: '+formatMoney(value));}
+function sellAll(){const items=state.base.filter(Boolean);if(!items.length){notify('Você não tem minérios para vender.');return;}let total=0;for(let i=0;i<state.base.length;i++){const ore=state.base[i];if(!ore)continue;const val=oreByKey(ore.key).sell*multiplier();total+=val;state.base[i]=null;state.stats.sold++;}state.money+=total;state.stats.totalEarned+=total;addFeed(`Você vendeu todos os minérios por <b>${formatMoney(total)}</b>.`);saveGame();renderAll();notify('Todos vendidos por '+formatMoney(total));}
+function stealOre(botId,slotIndex){const bot=state.bots.find(b=>b.id===botId);if(!bot||!Number.isInteger(slotIndex)||slotIndex<0||slotIndex>=BOT_SLOT_COUNT)return;const ore=bot.slots[slotIndex];if(!ore){notify('Esse espaço já está vazio.');return;}const free=state.base.findIndex(x=>!x);if(free<0){notify('Sua base está cheia! Venda algum minério primeiro.');return;}state.base[free]=ore;bot.slots[slotIndex]=null;state.stats.stolen++;markCollected(ore);const data=oreByKey(ore.key);addFeed(`Você roubou <b>${data.name}</b> da base de ${bot.name}!`);saveGame();renderAll();notify('Você roubou '+data.name+'!');}
+function doRebirth(){const level=state.rebirths;if(level>=3)return;const req=REBIRTH_REQUIREMENTS[level];if(state.money<req){notify('Você precisa de '+formatMoney(req)+' para fazer rebirth.');return;}const ok=confirm(`Fazer Rebirth ${level+1}?\n\nVocê perderá seu dinheiro e os minérios da sua base. Vai receber o multiplicador ${MULTIPLIERS[level+1].toFixed(2)}x, velocidade ${SPEEDS[level+1].toFixed(2)}x e +1 espaço permanente na base.\n\nContinuar?`);if(!ok)return;state.rebirths++;state.stats.rebirths++;state.money=500;state.base=Array(baseSlotLimit()).fill(null);addFeed(`<b>REBirth ${state.rebirths} concluído!</b> +1 espaço na base. Agora você tem ${baseSlotLimit()} espaços.`);saveGame();renderAll();notify('Rebirth '+state.rebirths+' conquistado! +1 espaço!');showTab('rebirth');}
+function refreshBots(){state.bots=makeBotBases();state.lastBotRefresh=Date.now();addFeed('As bases simuladas receberam novos minérios!');saveGame();renderBots();notify('As bases foram renovadas!');}
+function showTab(name){document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('hidden',el.id!=='tab-'+name));document.querySelectorAll('.nav button').forEach(btn=>btn.classList.toggle('active',btn.dataset.tab===name));if(name==='base')renderBase();if(name==='steal')renderBots();if(name==='index')renderIndex();if(name==='rebirth')renderRebirth();if(name==='stats')renderStats();}
+function prepareAdminEvent(now){if(!isAdminEventActive(now)||state.adminEventPrepared)return;while(state.belt.length<EVENT_BELT_LIMIT)state.belt.push(makeOre());state.bots=makeBotBases();state.lastBotRefresh=now;state.adminEventPrepared=true;addFeed('<b>🛠️ ADMIN ABUSE ATIVADO!</b> Esteira com 20 minérios e bases especiais.');saveGame();renderAll();notify('ADMIN ABUSE começou! 20 minérios na esteira!');}
+function finishAdminEvent(now){if(now<ADMIN_EVENT_END||!state.adminEventPrepared||state.adminEventEnded)return;state.bots=makeBotBases();state.lastBotRefresh=now;state.adminEventEnded=true;addFeed('<b>ADMIN ABUSE encerrado.</b> As bases voltaram às chances normais.');saveGame();renderBots();}
+function renderAdminEvent(now){const status=document.getElementById('adminEventStatus');const banner=document.getElementById('adminEventBanner');if(isAdminEventActive(now)){const left=ADMIN_EVENT_END-now;const mm=String(Math.floor(left/60000)).padStart(2,'0');const ss=String(Math.floor((left%60000)/1000)).padStart(2,'0');status.textContent=`ATIVO! Termina em ${mm}:${ss}. Bônus de raridade +0,25 p.p.; 20 espaços na esteira.`;banner.style.borderLeftColor='#dc9aff';}else if(now<ADMIN_EVENT_START){const left=ADMIN_EVENT_START-now;const hh=String(Math.floor(left/3600000)).padStart(2,'0');const mm=String(Math.floor((left%3600000)/60000)).padStart(2,'0');const ss=String(Math.floor((left%60000)/1000)).padStart(2,'0');status.textContent=`Começa às 21:05 — faltam ${hh}:${mm}:${ss}. Termina às 21:20.`;banner.style.borderLeftColor='#ffc85c';}else{status.textContent='Evento encerrado às 21:20. As chances e a esteira voltaram ao normal.';banner.style.borderLeftColor='#61df9a';}}
+function applyOfflineProgress(){const now=Date.now();const elapsed=Math.max(0,Math.min(8*60*60*1000,now-state.lastTick));const earned=incomePerSecond()*(elapsed/1000);if(earned>0){state.money+=earned;state.stats.totalEarned+=earned;state.feed.unshift(`Enquanto você estava fora, sua base produziu <b>${formatMoney(earned)}</b>.`);state.feed=state.feed.slice(0,20);}if(now-state.lastBotRefresh>=BOT_REFRESH_MS){state.bots=makeBotBases();state.lastBotRefresh=now;}if(now>=ADMIN_EVENT_START&&now<ADMIN_EVENT_END&&!state.adminEventPrepared)prepareAdminEvent(now);if(state.nextSpawnAt<now)state.nextSpawnAt=now+Math.max(1500,6000/speed());state.lastTick=now;}
+function loop(){const now=Date.now();const delta=Math.max(0,Math.min(2,(now-state.lastTick)/1000));if(delta>0){const earned=incomePerSecond()*delta;state.money+=earned;state.stats.totalEarned+=earned;state.lastTick=now;}
+  prepareAdminEvent(now);
+  finishAdminEvent(now);
+  const currentLimit=beltLimit(now);const spawnInterval=6000/speed();if(now>=state.nextSpawnAt){if(state.belt.length<currentLimit)state.belt.push(makeOre());state.nextSpawnAt=now+spawnInterval;renderBelt();}
+  if(now-state.lastBotRefresh>=BOT_REFRESH_MS)refreshBots();
+  const remaining=Math.max(0,state.nextSpawnAt-now);document.getElementById('beltStatus').textContent=state.belt.length>=currentLimit?(state.belt.length>currentLimit?'Estoque do evento: '+state.belt.length+' minérios':'Esteira cheia'):`Próximo minério em ${Math.ceil(remaining/1000)}s`;
+  document.getElementById('beltCapacityNote').textContent=isAdminEventActive(now)?'Admin Abuse ativo: até 20 minérios na esteira. Ela continua repondo independentemente dos espaços da sua base.':'A esteira normal guarda até 8 minérios e continua recebendo novos mesmo com sua base cheia.';
+  const refreshRemaining=Math.max(0,BOT_REFRESH_MS-(now-state.lastBotRefresh));const mm=String(Math.floor(refreshRemaining/60000)).padStart(2,'0');const ss=String(Math.floor((refreshRemaining%60000)/1000)).padStart(2,'0');document.getElementById('refreshTimer').textContent=mm+':'+ss;
+  renderAdminEvent(now);renderChances();renderHeader();updateBeltButtons();
+  if(now-lastRender>10000){saveGame();lastRender=now;}
+}
+
+document.querySelectorAll('.nav button').forEach(btn=>btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
+document.getElementById('sellAll').addEventListener('click',sellAll);
+document.getElementById('resetGame').addEventListener('click',()=>{if(!confirm('Tem certeza que deseja apagar todo o progresso e começar do zero?'))return;localStorage.removeItem(SAVE_KEY);state=freshState();addFeed('Novo jogo iniciado!');saveGame();renderAll();showTab('belt');notify('Jogo reiniciado.');});
+window.addEventListener('beforeunload',saveGame);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveGame();});
+
+state=loadState();applyOfflineProgress();
+if(!state.belt.length)state.belt=Array.from({length:4},()=>makeOre());
+if(!state.feed.length)addFeed('Bem-vindo! Compre minérios na esteira para começar.');
+if(isAdminEventActive()&&!state.adminEventPrepared)prepareAdminEvent(Date.now());
+finishAdminEvent(Date.now());
+saveGame();renderAll();renderAdminEvent(Date.now());
+setInterval(loop,1000);
+</script>
+</body>
+</html>
