@@ -1,0 +1,1177 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Museu do Grok</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: galeria de museu. Telas de menu em coluna única; no jogo, HUD no topo, quatro abas (Deserto, Museu, Melhorias, Conquistas) numa barra fixa embaixo, vitrines em grade de 5 colunas. */
+:root {
+  --wall: #dde4db;
+  --panel: #edf0e8;
+  --ink: #1b2823;
+  --muted: #55645d;
+  --brass: #7d5f17;
+  --brass-fill: #c7a047;
+  --back: #2b4639;
+  --face: #eef0e7;
+  --face-ink: #22322b;
+  --line: #b9c4b8;
+  --hell: #9a2f24;
+  --scrim: rgba(18, 28, 24, 0.62);
+  --d-sky: #f1d49a; --d-sun: #fff3cf; --d-dune2: #d8a85a; --d-dune1: #c18c42; --d-pit: #6b4a25; --d-cactus: #4f6b3c;
+  --n-sky: #1c2540; --n-sun: #1c2540; --n-dune2: #5a4a3b; --n-dune1: #473a2f; --n-pit: #24190f; --n-cactus: #2d3d2a;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wall: #121c18; --panel: #1b2a24; --ink: #e5eae2; --muted: #9db0a6;
+    --brass: #d6b25f; --brass-fill: #d6b25f; --back: #2a463a; --face: #e7eadf; --face-ink: #1f2e27;
+    --line: #2c3f36; --hell: #e0735f; --scrim: rgba(0, 0, 0, 0.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --wall: #121c18; --panel: #1b2a24; --ink: #e5eae2; --muted: #9db0a6;
+  --brass: #d6b25f; --brass-fill: #d6b25f; --back: #2a463a; --face: #e7eadf; --face-ink: #1f2e27;
+  --line: #2c3f36; --hell: #e0735f; --scrim: rgba(0, 0, 0, 0.7);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--wall);
+  color: var(--ink);
+  font-family: var(--font-body);
+  padding-block: 20px 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body.ingame { padding-bottom: 96px; }
+button { font-family: inherit; }
+.screen { max-width: 460px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.eyebrow { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); font-weight: 600; margin: 0; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; margin: 0; text-wrap: balance; }
+h1 { font-size: 34px; line-height: 1.05; }
+h2 { font-size: 26px; line-height: 1.1; }
+h3 { font-size: 20px; line-height: 1.15; }
+p { margin: 0; line-height: 1.5; }
+.muted { color: var(--muted); font-size: 14px; }
+
+.btn { font-size: 15px; font-weight: 600; border-radius: 6px; padding: 13px 16px; cursor: pointer; border: 1px solid var(--ink); text-align: center; touch-action: manipulation; }
+.btn.primary { background: var(--ink); color: var(--wall); }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.small { font-size: 13px; padding: 9px 12px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn:focus-visible, .vit:focus-visible, .tab:focus-visible, .sw:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.back-btn { align-self: flex-start; background: none; border: 0; color: var(--muted); font-size: 14px; font-weight: 500; padding: 4px 0; cursor: pointer; }
+
+/* Título */
+#s-title { min-height: calc(100svh - 64px); justify-content: space-between; gap: 40px; }
+.title-main { display: flex; flex-direction: column; gap: 22px; margin-top: 6vh; }
+#s-title h1 { font-size: clamp(48px, 15vw, 68px); line-height: 1; }
+.beta { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; border: 1px solid var(--brass-fill); color: var(--brass); border-radius: 999px; padding: 3px 9px; align-self: flex-start; }
+.relics { display: flex; gap: 12px; color: var(--brass); }
+.relics svg { width: 46px; height: 46px; }
+.menu { display: flex; flex-direction: column; gap: 10px; max-width: 300px; }
+.menu .btn { width: 100%; padding: 15px 16px; font-size: 16px; }
+.foot-note { border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; color: var(--muted); }
+
+/* Listas e painéis */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.panel.brass { border-color: var(--brass-fill); }
+.steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 28px 1fr; gap: 10px; font-size: 14.5px; line-height: 1.5; }
+.steps li::before { content: counter(s); font-family: var(--font-display); font-size: 20px; color: var(--brass); line-height: 1.2; }
+.steps b { font-weight: 600; }
+.credit-row { display: flex; flex-direction: column; gap: 2px; padding: 12px 0; border-top: 1px solid var(--line); }
+.credit-row span { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.credit-row b { font-family: var(--font-display); font-weight: 400; font-size: 26px; }
+.set-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 6px 0; }
+.set-row + .set-row { border-top: 1px solid var(--line); padding-top: 14px; }
+.set-row b { font-size: 15px; font-weight: 600; }
+.sw { min-width: 96px; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--ink); background: transparent; color: var(--ink); }
+.sw[aria-checked="true"] { background: var(--ink); color: var(--wall); }
+
+/* Saves */
+.slot { display: flex; flex-direction: column; gap: 10px; }
+.slot-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.slot-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; color: var(--muted); white-space: nowrap; }
+.chip.dificil { color: var(--brass); border-color: var(--brass-fill); }
+.chip.hell { color: var(--hell); border-color: var(--hell); }
+
+/* Jogo */
+.hud { display: flex; flex-direction: column; gap: 10px; }
+.hud-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hud-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-top: 1px solid var(--line); min-width: 0; }
+.stat span { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.stat b { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.scene { --sky: var(--d-sky); --sun: var(--d-sun); --dune2: var(--d-dune2); --dune1: var(--d-dune1); --pit: var(--d-pit); --cactus: var(--d-cactus); border-radius: 6px; overflow: hidden; border: 1px solid var(--line); line-height: 0; }
+.scene[data-noite="true"] { --sky: var(--n-sky); --sun: var(--n-sun); --dune2: var(--n-dune2); --dune1: var(--n-dune1); --pit: var(--n-pit); --cactus: var(--n-cactus); }
+.scene svg { width: 100%; height: auto; display: block; }
+.scene .sky { fill: var(--sky); }
+.scene .sun { fill: var(--sun); transition: opacity 0.5s; }
+.scene .moon { fill: #e9edf5; opacity: 0; transition: opacity 0.5s; }
+.scene .stars { fill: #e9edf5; opacity: 0; transition: opacity 0.5s; }
+.scene[data-noite="true"] .sun { opacity: 0; }
+.scene[data-noite="true"] .moon, .scene[data-noite="true"] .stars { opacity: 0.95; }
+.scene .dune2 { fill: var(--dune2); }
+.scene .dune1 { fill: var(--dune1); }
+.scene .pit { fill: var(--pit); }
+.scene .cactus { fill: none; stroke: var(--cactus); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.scene .haze { fill: var(--dune2); opacity: 0; transition: opacity 0.4s; }
+.scene[data-storm="true"] .haze { opacity: 0.62; }
+.scene[data-bioma="neve"] { --sky: #c9dcec; --sun: #f6fbff; --dune2: #e8f0f6; --dune1: #d3e1ec; --pit: #8aa3b8; --cactus: #4a6a62; }
+.scene[data-bioma="neve"][data-noite="true"] { --sky: #142138; --sun: #142138; --dune2: #3f5063; --dune1: #324255; --pit: #1c2735; --cactus: #233a38; }
+.scene[data-bioma="pantano"] { --sky: #b9c79a; --sun: #eef0c8; --dune2: #6e8a4f; --dune1: #587443; --pit: #2f3e22; --cactus: #3a5230; }
+.scene[data-bioma="pantano"][data-noite="true"] { --sky: #16221c; --sun: #16221c; --dune2: #2b3d2a; --dune1: #233322; --pit: #101a12; --cactus: #1c2c1d; }
+.scene .deco { display: none; }
+.scene[data-bioma="deserto"] .d-deserto, .scene[data-bioma="neve"] .d-neve, .scene[data-bioma="pantano"] .d-pantano { display: inline; }
+.biomas { display: flex; gap: 8px; }
+.biomas .sw { min-width: 0; flex: 1; }
+
+.pips { display: flex; gap: 6px; flex-wrap: wrap; }
+.pips i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--brass-fill); display: block; }
+.pips i.on { background: var(--brass-fill); }
+.dig-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.dig-row b { font-size: 15px; font-variant-numeric: tabular-nums; }
+.dig-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.bigbtn { padding: 18px 16px; font-size: 18px; }
+
+.grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.vit { aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--line); display: grid; place-items: center; padding: 8px 6px; cursor: pointer; position: relative; min-width: 0; touch-action: manipulation; background: none; color: var(--muted); }
+.vit svg { width: 76%; height: auto; }
+.vit.vazio { border-style: dashed; }
+.vit.cheio { background: var(--face); color: var(--face-ink); border-color: var(--brass-fill); overflow: hidden; }
+.vit.cheio.raro { border-width: 2px; }
+.vit.cheio::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,0.5) 0 16%, transparent 16% 100%); pointer-events: none; }
+.vit.trava { background: var(--panel); opacity: 0.75; }
+.vit.trava.prox { opacity: 1; border-color: var(--brass-fill); color: var(--brass); }
+.vit .lab { position: absolute; bottom: 3px; left: 0; right: 0; text-align: center; font-size: 8.5px; line-height: 1; font-weight: 600; letter-spacing: 0.02em; padding: 0 2px; overflow: hidden; white-space: nowrap; text-overflow: clip; }
+.vit.cheio svg { margin-bottom: 6px; }
+
+.inv-row { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.inv-row:first-of-type { border-top: 0; }
+.inv-ico { width: 40px; height: 40px; color: var(--brass); }
+.inv-ico svg { width: 100%; height: 100%; }
+.inv-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.inv-main b { font-size: 14px; font-weight: 600; }
+.inv-main small { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--brass-fill); }
+.conq:not(.ok) { opacity: 0.55; }
+
+.up { display: flex; flex-direction: column; gap: 8px; }
+.up-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.up-cost { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--brass); white-space: nowrap; }
+
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; background: var(--wall); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 8px max(16px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); z-index: 10; }
+.tab { border: 1px solid transparent; background: none; color: var(--muted); font-size: 12.5px; font-weight: 600; padding: 13px 2px; border-radius: 6px; cursor: pointer; min-width: 0; }
+.tab[aria-current="page"] { background: var(--ink); color: var(--wall); }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(88px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--wall); padding: 11px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; max-width: min(92vw, 420px); text-align: center; z-index: 40; line-height: 1.4; }
+
+/* Folha de ações */
+.sheet { position: fixed; inset: 0; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center; z-index: 30; }
+.sheet-panel { background: var(--panel); border: 1px solid var(--brass-fill); border-bottom: 0; border-radius: 10px 10px 0 0; width: 100%; max-width: 460px; max-height: 88svh; overflow-y: auto; padding: 20px max(16px, env(safe-area-inset-left, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; }
+.sheet-panel ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.sheet-panel ul b { color: var(--ink); }
+.sheet-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+
+@media (prefers-reduced-motion: reduce) { .scene .sun, .scene .moon, .scene .stars, .scene .haze { transition: none; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-ambar" viewBox="0 0 64 64"><g class="ico">
+      <path d="M32 6L50 20L46 46L32 58L18 46L14 20Z"/><path d="M14 20L32 30L50 20M32 30V58"/>
+    </g></symbol>
+    <symbol id="i-inseto" viewBox="0 0 64 64"><g class="ico">
+      <path d="M32 6L50 20L46 46L32 58L18 46L14 20Z"/><path d="M14 20L32 30L50 20"/>
+      <ellipse cx="32" cy="42" rx="3.5" ry="6"/><circle cx="32" cy="34" r="2.5"/><path d="M28 40L23 37M36 40L41 37M28 45L23 48M36 45L41 48"/>
+    </g></symbol>
+    <symbol id="i-ouro" viewBox="0 0 64 64"><g class="ico">
+      <path d="M22 39L39 22M26 43L43 26"/>
+      <circle cx="19" cy="44" r="4.5"/><circle cx="25" cy="50" r="4.5"/><circle cx="45" cy="20" r="4.5"/><circle cx="39" cy="14" r="4.5"/>
+      <path d="M12 12V20M8 16H16M54 44V52M50 48H58"/>
+    </g></symbol>
+    <symbol id="i-ovo" viewBox="0 0 64 64"><g class="ico">
+      <path d="M32 7C20 7 14 25 14 38C14 49 22 57 32 57S50 49 50 38C50 25 44 7 32 7Z"/>
+      <circle cx="26" cy="36" r="3"/><circle cx="38" cy="45" r="3"/><circle cx="35" cy="25" r="2"/><circle cx="25" cy="48" r="1.8"/>
+    </g></symbol>
+    <symbol id="i-mumia" viewBox="0 0 64 64"><g class="ico">
+      <circle cx="32" cy="14" r="8"/><rect x="19" y="24" width="26" height="34" rx="7"/>
+      <path d="M19 33L45 39M19 41L45 47M19 49L45 55M28 13H30M34 13H36"/>
+    </g></symbol>
+    <symbol id="i-fossil" viewBox="0 0 64 64"><g class="ico">
+      <path d="M22 39L39 22M26 43L43 26"/>
+      <circle cx="19" cy="44" r="4.5"/><circle cx="25" cy="50" r="4.5"/><circle cx="45" cy="20" r="4.5"/><circle cx="39" cy="14" r="4.5"/>
+    </g></symbol>
+    <symbol id="i-esqueleto" viewBox="0 0 64 64"><g class="ico">
+      <path d="M6 28C10 21 18 21 22 25L27 27L22 31C18 35 10 35 6 28Z"/><circle cx="14" cy="27" r="1.5"/><path d="M12 31V33M16 31V33"/>
+      <path d="M24 28C34 24 46 28 58 40"/><path d="M31 27V38M36 26.5V39M41 28V39M46 31V40"/>
+      <path d="M32 38L28 54M44 38L47 54M28 54H24M47 54H51"/>
+    </g></symbol>
+    <symbol id="i-roseta" viewBox="0 0 64 64"><g class="ico">
+      <path d="M14 56V22L18 14L26 10L36 11L44 8L50 16V56Z"/><path d="M20 22H26M30 22H36M40 22H44M20 28H26M30 28H36M40 28H44"/>
+      <path d="M20 36H44M20 41H44M20 46H44M20 51H38"/>
+    </g></symbol>
+    <symbol id="i-cadeado" viewBox="0 0 64 64"><g class="ico">
+      <rect x="16" y="28" width="32" height="26" rx="4"/><path d="M22 28V20a10 10 0 0 1 20 0V28"/><path d="M32 38V44"/>
+    </g></symbol>
+    <symbol id="i-escaravelho" viewBox="0 0 64 64"><g class="ico">
+      <ellipse cx="32" cy="36" rx="13" ry="17"/><path d="M25 21C25 14 39 14 39 21M26 15L24 10M38 15L40 10M32 22V53"/>
+      <path d="M19 30L10 26M19 38L9 38M20 46L11 52M45 30L54 26M45 38L55 38M44 46L53 52"/>
+    </g></symbol>
+    <symbol id="i-mascara" viewBox="0 0 64 64"><g class="ico">
+      <path d="M32 6C18 6 12 14 12 26L8 54H20L22 40M32 6C46 6 52 14 52 26L56 54H44L42 40"/>
+      <ellipse cx="32" cy="30" rx="10" ry="14"/><path d="M27 27H30M34 27H37M32 29V35M29 40H35M30 44H34V52H30Z"/><path d="M12 34H20M52 34H44"/>
+    </g></symbol>
+    <symbol id="i-anfora" viewBox="0 0 64 64"><g class="ico">
+      <path d="M24 7H40V11H36V17C50 21 50 42 40 54H24C14 42 14 21 28 17V11H24Z"/><path d="M25 54H39V58H25Z"/>
+      <path d="M16 26C8 24 8 38 17 38M48 26C56 24 56 38 47 38"/><path d="M18 30H46M18 38H46"/>
+    </g></symbol>
+    <symbol id="i-espada" viewBox="0 0 64 64"><g class="ico">
+      <path d="M32 5L38 14V40H26V14Z"/><path d="M20 40H44M32 40V54M27 54H37"/>
+    </g></symbol>
+    <symbol id="i-escudo" viewBox="0 0 64 64"><g class="ico">
+      <path d="M14 12H50V32C50 44 40 52 32 58C24 52 14 44 14 32Z"/><path d="M32 12V58M14 30H50"/>
+    </g></symbol>
+    <symbol id="i-elmo" viewBox="0 0 64 64"><g class="ico">
+      <path d="M14 38C14 20 22 10 32 10S50 20 50 38V52H14Z"/><path d="M14 38H50M32 38V52M20 44H26M38 44H44M32 10V4"/>
+    </g></symbol>
+    <symbol id="i-pergaminho" viewBox="0 0 64 64"><g class="ico">
+      <path d="M16 12H44V46C44 52 48 54 48 54H24C20 54 16 52 16 46Z"/><path d="M16 12C12 12 12 20 16 20M24 22H38M24 30H38M24 38H34"/>
+    </g></symbol>
+    <symbol id="i-gelo" viewBox="0 0 64 64"><g class="ico">
+      <path d="M10 18H48V54H10Z"/><path d="M10 18L18 10H56L48 18M48 18V54L56 46V10"/>
+      <path d="M29 26V46M20 36H38M23 29L35 43M35 29L23 43"/>
+    </g></symbol>
+    <symbol id="i-totem" viewBox="0 0 64 64"><g class="ico">
+      <path d="M24 8H40V56H24Z"/><path d="M24 22H40M24 38H40M28 14H31M33 14H36M28 29L32 33L36 29M29 46H35"/>
+    </g></symbol>
+    <symbol id="i-urna" viewBox="0 0 64 64"><g class="ico">
+      <path d="M22 10H42M24 10C16 24 16 42 24 54H40C48 42 48 24 40 10"/><path d="M19 28H45M19 40H45"/>
+    </g></symbol>
+    <symbol id="i-adaga" viewBox="0 0 64 64"><g class="ico">
+      <path d="M32 5C42 18 40 32 32 40C24 32 22 18 32 5Z"/><path d="M24 42H40M32 42V56"/>
+    </g></symbol>
+    <symbol id="i-jacare" viewBox="0 0 64 64"><g class="ico">
+      <path d="M6 38C14 32 26 34 34 38L56 34L58 40L42 44C38 50 24 52 12 46Z"/><circle cx="38" cy="37" r="1.5"/><path d="M44 35L45 31M50 34L51 30M18 40L16 46M28 42L27 48"/>
+    </g></symbol>
+    <symbol id="i-sapo" viewBox="0 0 64 64"><g class="ico">
+      <path d="M14 42C14 30 22 24 32 24S50 30 50 42C50 50 42 54 32 54S14 50 14 42Z"/><circle cx="23" cy="20" r="5"/><circle cx="41" cy="20" r="5"/><path d="M24 44H40"/>
+    </g></symbol>
+    <symbol id="i-trofeu" viewBox="0 0 64 64"><g class="ico">
+      <path d="M20 10H44V26C44 34 38 38 32 38S20 34 20 26Z"/><path d="M20 14H12C12 22 16 26 20 26M44 14H52C52 22 48 26 44 26M32 38V48M24 54H40M27 48H37"/>
+    </g></symbol>
+  </defs>
+  <style>.ico { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }</style>
+</svg>
+
+<main id="app">
+  <!-- Título -->
+  <section class="screen" id="s-title">
+    <div class="title-main">
+      <span class="beta">Beta</span>
+      <h1>Museu do Grok</h1>
+      <p class="muted">Escave o deserto, monte esqueletos e encha as vitrines do seu museu de fósseis.</p>
+      <div class="relics" aria-hidden="true">
+        <svg viewBox="0 0 64 64"><use href="#i-ambar"/></svg>
+        <svg viewBox="0 0 64 64"><use href="#i-ovo"/></svg>
+        <svg viewBox="0 0 64 64"><use href="#i-esqueleto"/></svg>
+        <svg viewBox="0 0 64 64"><use href="#i-mumia"/></svg>
+      </div>
+      <nav class="menu" aria-label="Menu principal">
+        <button class="btn primary" type="button" data-go="saves">Jogar</button>
+        <button class="btn ghost" type="button" data-go="tutorial">Tutorial</button>
+        <button class="btn ghost" type="button" data-go="settings">Configurações</button>
+        <button class="btn ghost" type="button" data-go="credits">Créditos</button>
+      </nav>
+    </div>
+    <p class="foot-note">Versão beta. Algumas coisas ainda vão mudar e o equilíbrio do jogo está em teste.</p>
+  </section>
+
+  <!-- Tutorial -->
+  <section class="screen" id="s-tutorial" hidden>
+    <button class="back-btn" type="button" data-go="title">← Voltar</button>
+    <div><p class="eyebrow">Como jogar</p><h2>Tutorial</h2></div>
+    <ol class="steps">
+      <li><span>Você cuida de um museu de fósseis. O objetivo é encher as vitrines com peças que rendem moedas.</span></li>
+      <li><span>Vá ao <b>Deserto</b> e toque em Cavar. Você tem <b>3 escavações por dia</b>. Quando acabam, anoitece. Cuidado com as <b>tempestades de areia</b>, que fazem você perder escavações, e procure os <b>mapas do tesouro</b>.</span></li>
+      <li><span>O <b>âmbar</b> vai direto para uma vitrine. Os <b>fósseis</b> são de bichos aleatórios e ficam no depósito. Também aparecem <b>peças raras</b>: fóssil dourado, âmbar com inseto, ovo de dinossauro e múmia. Elas rendem muito.</span></li>
+      <li><span>Juntando <b>40 fósseis do mesmo bicho</b>, você monta o esqueleto inteiro, que rende bem mais na vitrine.</span></li>
+      <li><span>Toque em <b>Encerrar o dia</b> para o museu receber os visitantes. Cada peça exposta rende moedas. Todo dia um visitante faz um <b>pedido</b>: se a peça estiver exposta, ele paga extra.</span></li>
+      <li><span>Gaste as moedas em <b>Melhorias</b>: mais vitrines (você começa com 3 de 30), mais escavações por dia (até 10) e <b>pesquisadores</b>, que escavam sozinhos quando o dia termina.</span></li>
+      <li><span>Com todas as vitrines abertas, dá para fazer a <b>expansão</b>: museus de 50, 70, 100 e 150 vitrines. Você perde tudo, leva só 1 item e começa com 1 vitrine.</span></li>
+      <li><span>Escolha o modo ao criar o save: <b>Clássico</b>, <b>Difícil</b> ou <b>Hell</b>. No Hell tem <b>ladrões</b> à noite, e a <b>segurança</b> em Melhorias diminui o risco.</span></li>
+      <li><span>Além do deserto, você pode escavar a <b>Neve</b>, onde acha itens medievais e bichos congelados, e o <b>Pântano</b>, com relíquias e bichos antigos. As escavações do dia são as mesmas para os três biomas. Todo bioma dá <b>relíquias</b> e não só bichos.</span></li>
+      <li><span>Os itens da Neve e do Pântano só podem ficar nas vitrines depois que você construir a <b>Sala gelada</b> (1.000 moedas) e a <b>Câmara do pântano</b> (5.000 moedas) em Melhorias. Antes disso eles ficam na mochila e podem ser vendidos. Ao trocar de museu as salas também se perdem.</span></li>
+      <li><span>Na <b>Loja</b>, dentro de Museu, dá para vender âmbar, fósseis e peças raras por moedas. Os preços mudam todo dia, então vale esperar um item <b>em alta</b>. Cuidado: fóssil vendido não conta para o esqueleto.</span></li>
+      <li><span>Cumpra as <b>Conquistas</b> e ajuste o som e a vibração em Configurações.</span></li>
+    </ol>
+    <button class="btn primary" type="button" data-go="saves">Ir jogar</button>
+  </section>
+
+  <!-- Saves -->
+  <section class="screen" id="s-saves" hidden>
+    <button class="back-btn" type="button" data-go="title">← Voltar</button>
+    <div><p class="eyebrow">Jogar</p><h2>Escolha um save</h2></div>
+    <div id="slots" style="display:flex;flex-direction:column;gap:12px"></div>
+    <p class="muted" id="store-warn" hidden>Este navegador não deixou salvar. O progresso vale só até fechar a página.</p>
+  </section>
+
+  <!-- Configurações -->
+  <section class="screen" id="s-settings" hidden>
+    <button class="back-btn" type="button" data-go="title">← Voltar</button>
+    <div><p class="eyebrow">Menu</p><h2>Configurações</h2></div>
+    <div class="panel">
+      <div class="set-row">
+        <div><b>Som</b><p class="muted">Efeitos ao cavar, achar e ganhar moedas.</p></div>
+        <button class="sw" type="button" role="switch" id="sw-som" aria-checked="true">Ligado</button>
+      </div>
+      <div class="set-row">
+        <div><b>Vibração</b><p class="muted">Pode não funcionar em todos os aparelhos.</p></div>
+        <button class="sw" type="button" role="switch" id="sw-vib" aria-checked="true">Ligado</button>
+      </div>
+    </div>
+    <p class="muted">Os saves ficam guardados neste aparelho.</p>
+    <button class="btn ghost" type="button" id="wipe">Apagar todos os saves</button>
+  </section>
+
+  <!-- Créditos -->
+  <section class="screen" id="s-credits" hidden>
+    <button class="back-btn" type="button" data-go="title">← Voltar</button>
+    <div><p class="eyebrow">Equipe</p><h2>Créditos</h2></div>
+    <div>
+      <div class="credit-row"><span>Adm</span><b>Carlão</b></div>
+      <div class="credit-row"><span>Operador e criação</span><b>Rei Grok IA</b></div>
+      <div class="credit-row"><span>Programação do jogo</span><b>Claude</b></div>
+      <div class="credit-row"><span>Estado</span><b>Beta</b></div>
+    </div>
+  </section>
+
+  <!-- Jogo -->
+  <section class="screen" id="s-game" hidden>
+    <div class="hud">
+      <div class="hud-top">
+        <button class="btn ghost small" type="button" id="exit">← Saves</button>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="chip" id="hud-mode">Clássico</span>
+          <span class="chip" id="hud-museu">Museu 1</span>
+        </div>
+      </div>
+      <div class="hud-stats">
+        <div class="stat"><span>Dia</span><b id="hud-dia">1</b></div>
+        <div class="stat"><span>Moedas</span><b id="hud-moedas">0</b></div>
+        <div class="stat"><span>Rende/dia</span><b id="hud-renda">0</b></div>
+      </div>
+    </div>
+
+    <!-- Deserto -->
+    <div class="screen" id="v-deserto" style="gap:14px">
+      <div class="biomas" id="biomas" role="radiogroup" aria-label="Bioma">
+        <button class="sw" type="button" role="radio" data-bioma="deserto" aria-checked="true">Deserto</button>
+        <button class="sw" type="button" role="radio" data-bioma="neve" aria-checked="false">Neve</button>
+        <button class="sw" type="button" role="radio" data-bioma="pantano" aria-checked="false">Pântano</button>
+      </div>
+      <div class="scene" id="scene" data-bioma="deserto" data-noite="false" data-storm="false">
+        <svg viewBox="0 0 400 170" role="img" aria-label="Deserto">
+          <rect class="sky" width="400" height="170"/>
+          <g class="stars"><circle cx="40" cy="24" r="1.6"/><circle cx="96" cy="50" r="1.4"/><circle cx="150" cy="18" r="1.8"/><circle cx="212" cy="42" r="1.4"/><circle cx="262" cy="20" r="1.6"/><circle cx="350" cy="30" r="1.4"/><circle cx="372" cy="70" r="1.6"/><circle cx="64" cy="78" r="1.2"/></g>
+          <circle class="sun" cx="310" cy="56" r="24"/>
+          <circle class="moon" cx="310" cy="56" r="17"/>
+          <path class="dune2" d="M0 112C60 88 120 98 190 112S330 100 400 92V170H0Z"/>
+          <path class="dune1" d="M0 138C80 116 150 130 230 138S350 124 400 132V170H0Z"/>
+          <ellipse class="pit" cx="128" cy="148" rx="30" ry="8"/>
+          <g class="deco d-deserto"><path class="cactus" d="M338 142V112M338 128H326V118M338 122H350V110"/></g>
+          <g class="deco d-neve"><path class="cactus" d="M70 144L84 116L98 144Z M84 116V108"/><path class="cactus" d="M300 142L310 120L320 142Z"/></g>
+          <g class="deco d-pantano"><path class="cactus" d="M318 146V114M330 146V104M342 146V118M354 146V110"/><path class="cactus" d="M20 150Q40 140 60 150"/></g>
+          <rect class="haze" width="400" height="170"/>
+        </svg>
+      </div>
+      <div class="dig-row">
+        <div class="pips" id="pips" aria-hidden="true"></div>
+        <div class="dig-info"><span class="chip dificil" id="mapa-chip" hidden>Mapa ativo</span><b id="dig-count">3 de 3</b></div>
+      </div>
+      <button class="btn primary bigbtn" type="button" id="cavar">Cavar</button>
+      <div class="panel brass" aria-live="polite">
+        <p class="eyebrow" id="achado-eb">Último achado</p>
+        <p id="achado-txt">Cave no deserto para achar âmbar e fósseis. Ao anoitecer você não pode mais cavar.</p>
+      </div>
+      <button class="btn ghost" type="button" id="fim-dia">Encerrar o dia</button>
+    </div>
+
+    <!-- Museu -->
+    <div class="screen" id="v-museu" hidden style="gap:14px">
+      <div class="panel brass" id="pedido"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+        <h3>Vitrines</h3><span class="muted" id="vit-count">3/30</span>
+      </div>
+      <div class="grid" id="vit-grid"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:6px">
+        <h3>Depósito</h3><span class="muted">40 fósseis viram um esqueleto</span>
+      </div>
+      <div class="panel" id="deposito"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:6px">
+        <h3>Loja</h3><span class="muted">Os preços mudam todo dia</span>
+      </div>
+      <div class="panel" id="loja"></div>
+    </div>
+
+    <!-- Melhorias -->
+    <div class="screen" id="v-melhorias" hidden style="gap:14px">
+      <h3>Melhorias</h3>
+      <div id="ups" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+
+    <!-- Conquistas -->
+    <div class="screen" id="v-conquistas" hidden style="gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px">
+        <h3>Conquistas</h3><span class="muted" id="conq-count">0/15</span>
+      </div>
+      <div class="panel" id="conq"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs" aria-label="Seções do jogo" hidden>
+  <button class="tab" type="button" data-tab="deserto" aria-current="page">Escavar</button>
+  <button class="tab" type="button" data-tab="museu">Museu</button>
+  <button class="tab" type="button" data-tab="melhorias">Melhorias</button>
+  <button class="tab" type="button" data-tab="conquistas">Conquistas</button>
+</nav>
+
+<div class="toast" id="toast" hidden></div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sh-title">
+    <p class="eyebrow" id="sh-eyebrow"></p>
+    <h2 id="sh-title"></h2>
+    <div id="sh-body" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="sheet-actions" id="sh-actions"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+
+  /* ---------- Dados ---------- */
+  var ANIMAIS = [
+    { id: 'trex', nome: 'Tiranossauro', valor: 400 },
+    { id: 'tricera', nome: 'Triceratops', valor: 300 },
+    { id: 'ptero', nome: 'Pterodáctilo', valor: 260 },
+    { id: 'mamute', nome: 'Mamute-lanoso', valor: 220 },
+    { id: 'smilodon', nome: 'Tigre-dentes-de-sabre', valor: 180 },
+    { id: 'preguica', nome: 'Preguiça-gigante', valor: 140 }
+  ];
+  var ITENS = {
+    amber: { nome: 'Âmbar', valor: 8, icon: 'ambar', curto: '' },
+    inseto: { nome: 'Âmbar com inseto', valor: 45, icon: 'inseto', curto: 'Inseto', raro: true },
+    ouro: { nome: 'Fóssil dourado', valor: 70, icon: 'ouro', curto: 'Dourado', raro: true },
+    ovo: { nome: 'Ovo de dinossauro', valor: 90, icon: 'ovo', curto: 'Ovo', raro: true },
+    mumia: { nome: 'Múmia', valor: 120, icon: 'mumia', curto: 'Múmia', raro: true },
+    escaravelho: { nome: 'Escaravelho sagrado', valor: 55, icon: 'escaravelho', curto: 'Escarav.', bioma: 'deserto' },
+    anfora: { nome: 'Ânfora antiga', valor: 40, icon: 'anfora', curto: 'Ânfora', bioma: 'deserto' },
+    mascara: { nome: 'Máscara funerária', valor: 110, icon: 'mascara', curto: 'Máscara', raro: true, bioma: 'deserto' },
+    roseta: { nome: 'Pedra de Roseta', valor: 160, icon: 'roseta', curto: 'Roseta', raro: true, bioma: 'deserto' },
+    espada: { nome: 'Espada medieval', valor: 120, icon: 'espada', curto: 'Espada', bioma: 'neve', sala: 'gelada' },
+    escudo: { nome: 'Escudo brasonado', valor: 100, icon: 'escudo', curto: 'Escudo', bioma: 'neve', sala: 'gelada' },
+    pergaminho: { nome: 'Pergaminho real', valor: 80, icon: 'pergaminho', curto: 'Pergam.', bioma: 'neve', sala: 'gelada' },
+    elmo: { nome: 'Elmo de cavaleiro', valor: 160, icon: 'elmo', curto: 'Elmo', raro: true, bioma: 'neve', sala: 'gelada' },
+    lobo: { nome: 'Lobo congelado', valor: 200, icon: 'gelo', curto: 'Lobo', bioma: 'neve', sala: 'gelada' },
+    urso: { nome: 'Urso congelado', valor: 240, icon: 'gelo', curto: 'Urso', bioma: 'neve', sala: 'gelada' },
+    mamutec: { nome: 'Mamute congelado', valor: 320, icon: 'gelo', curto: 'Mamute', raro: true, bioma: 'neve', sala: 'gelada' },
+    totem: { nome: 'Totem do pântano', valor: 140, icon: 'totem', curto: 'Totem', bioma: 'pantano', sala: 'camara' },
+    urna: { nome: 'Urna ancestral', valor: 90, icon: 'urna', curto: 'Urna', bioma: 'pantano', sala: 'camara' },
+    adaga: { nome: 'Adaga ritual', valor: 100, icon: 'adaga', curto: 'Adaga', bioma: 'pantano', sala: 'camara' },
+    sapo: { nome: 'Sapo gigante fossilizado', valor: 200, icon: 'sapo', curto: 'Sapo', bioma: 'pantano', sala: 'camara' },
+    croc: { nome: 'Crocodilo ancestral', valor: 420, icon: 'jacare', curto: 'Croc.', raro: true, bioma: 'pantano', sala: 'camara' }
+  };
+  var ORDEM_ITENS = Object.keys(ITENS);
+  var SALAS = {
+    gelada: { nome: 'Sala gelada', custo: 1000, bioma: 'Neve' },
+    camara: { nome: 'Câmara do pântano', custo: 5000, bioma: 'Pântano' }
+  };
+  var BIOMAS = {
+    deserto: { nome: 'Deserto', raros: ['ovo', 'ovo', 'ovo', 'mumia', 'mumia', 'mascara', 'roseta'] },
+    neve: { nome: 'Neve', reliquias: ['espada', 'escudo', 'pergaminho'], bichos: ['lobo', 'urso'], raros: ['mamutec', 'mamutec', 'elmo'] },
+    pantano: { nome: 'Pântano', reliquias: ['totem', 'urna', 'adaga'], bichos: ['sapo', 'sapo'], raros: ['croc'] }
+  };
+  var PEDIDO_BASE = ['inseto', 'ouro', 'ovo', 'mumia', 'mascara', 'roseta', 'escaravelho', 'anfora'];
+  var RAROS_SORTEIO = ['inseto', 'inseto', 'inseto', 'ouro', 'ouro', 'ouro', 'ovo', 'ovo', 'mumia'];
+  var MODOS = {
+    classico: { nome: 'Clássico', rend: 1, custo: 1, ganho: 1, storm: 0.06, ladrao: false, desc: 'Ritmo tranquilo. Valores normais e poucas tempestades.' },
+    dificil: { nome: 'Difícil', rend: 0.8, custo: 1.6, ganho: 0.6, storm: 0.09, ladrao: false, desc: 'Achados menores, visitantes pagam menos, melhorias 60% mais caras e mais tempestades.' },
+    hell: { nome: 'Hell', rend: 0.6, custo: 2.5, ganho: 0.35, storm: 0.14, ladrao: true, desc: 'Achados bem pequenos, renda baixa, melhorias muito caras, muitas tempestades e ladrões à noite.' }
+  };
+  var CAP = [30, 50, 70, 100, 150];
+  var AMBAR_VENDA = 4, FOSSEIS_ESQ = 40, DIG_BASE = 3, DIG_MAX = 10, PESQ_MAX = 5, SEG_MAX = 5;
+  var KEYS = ['museu-save-1', 'museu-save-2', 'museu-save-3'];
+  var INTRO = 'Cave no deserto para achar âmbar e fósseis. Ao anoitecer você não pode mais cavar.';
+  var VISITANTES = ['Dona Marlene', 'Seu Jorge', 'Uma turma de escola', 'Um professor', 'Uma historiadora', 'Um garoto curioso', 'Uma turista'];
+
+  function animal(id) { return ANIMAIS.filter(function (a) { return a.id === id; })[0]; }
+  function fmt(n) { return Math.round(n).toLocaleString('pt-BR'); }
+  function icon(id) { return '<svg viewBox="0 0 64 64" aria-hidden="true"><use href="#i-' + id + '"/></svg>'; }
+
+  /* ---------- Configuração, som e vibração ---------- */
+  var cfg = { som: true, vib: true };
+  try { var c0 = JSON.parse(localStorage.getItem('museu-config')); if (c0) { cfg.som = c0.som !== false; cfg.vib = c0.vib !== false; } } catch (e) {}
+  function salvarCfg() { try { localStorage.setItem('museu-config', JSON.stringify(cfg)); } catch (e) {} }
+  var ac = null;
+  function ctx() {
+    if (ac === null) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = false; } }
+    if (ac && ac.state === 'suspended') { try { ac.resume(); } catch (e) {} }
+    return ac || null;
+  }
+  function tom(f, t0, dur, tipo, vol, fim) {
+    var c = ctx(); if (!c) return;
+    var o = c.createOscillator(), g = c.createGain(), t = c.currentTime + t0;
+    o.type = tipo || 'sine';
+    o.frequency.setValueAtTime(f, t);
+    if (fim) o.frequency.exponentialRampToValueAtTime(fim, t + dur);
+    g.gain.setValueAtTime(vol || 0.12, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + dur + 0.03);
+  }
+  function som(n) {
+    if (!cfg.som) return;
+    try {
+      if (n === 'cava') tom(140, 0, 0.14, 'triangle', 0.2, 60);
+      else if (n === 'achado') { tom(520, 0, 0.1, 'sine'); tom(780, 0.09, 0.14, 'sine'); }
+      else if (n === 'raro') { [523, 659, 784, 1046].forEach(function (f, i) { tom(f, i * 0.09, 0.18, 'triangle', 0.14); }); }
+      else if (n === 'moeda') { tom(988, 0, 0.08, 'square', 0.05); tom(1319, 0.08, 0.22, 'square', 0.05); }
+      else if (n === 'erro') tom(160, 0, 0.3, 'sawtooth', 0.1, 80);
+      else if (n === 'tempestade') tom(90, 0, 0.5, 'sawtooth', 0.09, 50);
+    } catch (e) {}
+  }
+  function vibrar(p) { if (!cfg.vib) return; try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+  function renderCfg() {
+    [['#sw-som', 'som'], ['#sw-vib', 'vib']].forEach(function (x) {
+      var b = $(x[0]); b.setAttribute('aria-checked', cfg[x[1]] ? 'true' : 'false'); b.textContent = cfg[x[1]] ? 'Ligado' : 'Desligado';
+    });
+  }
+  $('#sw-som').addEventListener('click', function () { cfg.som = !cfg.som; salvarCfg(); renderCfg(); som('achado'); });
+  $('#sw-vib').addEventListener('click', function () { cfg.vib = !cfg.vib; salvarCfg(); renderCfg(); vibrar(40); });
+
+  /* ---------- Toast ---------- */
+  var toastT = null;
+  function toast(msg) {
+    var t = $('#toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 3200);
+  }
+
+  /* ---------- Saves ---------- */
+  var mem = {}, storageOk = true;
+  function ler(i) {
+    try { var t = localStorage.getItem(KEYS[i]); return t ? JSON.parse(t) : null; }
+    catch (e) { storageOk = false; return mem[i] || null; }
+  }
+  function gravar(i, s) {
+    mem[i] = s;
+    try { localStorage.setItem(KEYS[i], JSON.stringify(s)); } catch (e) { storageOk = false; }
+  }
+  function apagar(i) {
+    delete mem[i];
+    try { localStorage.removeItem(KEYS[i]); } catch (e) { storageOk = false; }
+  }
+  function novoPedido(salas) {
+    salas = salas || {};
+    var pool = PEDIDO_BASE.slice();
+    ORDEM_ITENS.forEach(function (key) { var sl = ITENS[key].sala; if (sl && salas[sl]) pool.push(key); });
+    var k = Math.random() < 0.5 ? 'sk:' + pick(ANIMAIS).id : pick(pool);
+    return { k: k, v: pick(VISITANTES) };
+  }
+  var BASE_VENDA = { amber: 4, fossil: 3 };
+  Object.keys(ITENS).forEach(function (k) { if (k !== 'amber') BASE_VENDA[k] = Math.round(ITENS[k].valor * 0.5); });
+  var MULTS = [0.5, 0.75, 1, 1, 1, 1.25, 1.5, 2];
+  function novoMercado() { var m = {}; Object.keys(BASE_VENDA).forEach(function (k) { m[k] = pick(MULTS); }); return m; }
+  function migrar(s) {
+    if (!s.itens) s.itens = { amber: s.ambar || 0 };
+    delete s.ambar;
+    ORDEM_ITENS.forEach(function (k) { if (typeof s.itens[k] !== 'number') s.itens[k] = 0; });
+    s.fosseis = s.fosseis || {}; s.esqueletos = s.esqueletos || {};
+    s.pesq = s.pesq || 0; s.seg = s.seg || 0; s.mapa = !!s.mapa; s.tempestade = false;
+    s.conq = s.conq || {}; s.animais = s.animais || {};
+    s.stats = s.stats || {};
+    ['cavadas', 'esqueletos', 'raros', 'tempestades', 'pedidos', 'maxVit', 'maxMoedas'].forEach(function (k) { if (typeof s.stats[k] !== 'number') s.stats[k] = 0; });
+    s.salas = s.salas || {}; s.salas.gelada = !!s.salas.gelada; s.salas.camara = !!s.salas.camara;
+    s.bioma = BIOMAS[s.bioma] ? s.bioma : 'deserto';
+    if (!s.pedido) s.pedido = novoPedido(s.salas);
+    s.mercado = s.mercado || {};
+    Object.keys(BASE_VENDA).forEach(function (k) { if (!s.mercado[k]) s.mercado[k] = pick(MULTS); });
+    if (!s.eb) s.eb = 'Último achado';
+    if (!s.ultimo) s.ultimo = INTRO;
+    s.v = 2;
+    return s;
+  }
+  function novoSave(mode) {
+    var exp = []; for (var k = 0; k < CAP[0]; k++) exp.push(null);
+    return migrar({ mode: mode, dia: 1, moedas: 0, museu: 1, vitrines: 3, digMax: DIG_BASE, digsLeft: DIG_BASE, expo: exp, criado: Date.now() });
+  }
+
+  var cur = null, slot = -1;
+
+  /* ---------- Conquistas ---------- */
+  var CONQ = [
+    { id: 'pa', nome: 'Primeira pá', desc: 'Faça a primeira escavação.', ok: function (s) { return s.stats.cavadas >= 1; } },
+    { id: 'calo', nome: 'Mão calejada', desc: 'Cave 100 vezes.', ok: function (s) { return s.stats.cavadas >= 100; } },
+    { id: 'esq1', nome: 'Primeiro esqueleto', desc: 'Monte um esqueleto.', ok: function (s) { return s.stats.esqueletos >= 1; } },
+    { id: 'zoo', nome: 'Bicho de tudo', desc: 'Monte o esqueleto dos 6 animais.', ok: function (s) { return Object.keys(s.animais).length >= 6; } },
+    { id: 'raro', nome: 'Olho de águia', desc: 'Ache uma peça rara.', ok: function (s) { return s.stats.raros >= 1; } },
+    { id: 'raro5', nome: 'Caçador de relíquias', desc: 'Ache 5 peças raras.', ok: function (s) { return s.stats.raros >= 5; } },
+    { id: 'tempest', nome: 'Pó nos olhos', desc: 'Passe por uma tempestade de areia.', ok: function (s) { return s.stats.tempestades >= 1; } },
+    { id: 'galeria', nome: 'Galeria', desc: 'Abra 10 vitrines.', ok: function (s) { return s.stats.maxVit >= 10; } },
+    { id: 'lotado', nome: 'Museu lotado', desc: 'Abra as 30 vitrines.', ok: function (s) { return s.stats.maxVit >= 30; } },
+    { id: 'museu2', nome: 'Segundo museu', desc: 'Faça a primeira expansão.', ok: function (s) { return s.museu >= 2; } },
+    { id: 'turno', nome: 'Turno completo', desc: 'Chegue a 10 escavações por dia.', ok: function (s) { return s.digMax >= DIG_MAX; } },
+    { id: 'equipe', nome: 'Equipe completa', desc: 'Contrate 5 pesquisadores.', ok: function (s) { return s.pesq >= PESQ_MAX; } },
+    { id: 'anfitriao', nome: 'Anfitrião', desc: 'Atenda 5 pedidos de visitantes.', ok: function (s) { return s.stats.pedidos >= 5; } },
+    { id: 'cofre', nome: 'Cofre cheio', desc: 'Junte 1.000 moedas.', ok: function (s) { return s.stats.maxMoedas >= 1000; } },
+    { id: 'hell', nome: 'Sobrevivente do Hell', desc: 'Chegue ao dia 11 no modo Hell.', ok: function (s) { return s.mode === 'hell' && s.dia >= 11; } },
+    { id: 'gelo', nome: 'Sala de gelo', desc: 'Construa a Sala gelada.', ok: function (s) { return !!s.salas.gelada; } },
+    { id: 'brejo', nome: 'Rei do brejo', desc: 'Construa a Câmara do pântano.', ok: function (s) { return !!s.salas.camara; } }
+  ];
+  function checarConq() {
+    if (!cur) return;
+    cur.stats.maxVit = Math.max(cur.stats.maxVit, cur.vitrines);
+    cur.stats.maxMoedas = Math.max(cur.stats.maxMoedas, cur.moedas);
+    var novas = [];
+    CONQ.forEach(function (c) { if (!cur.conq[c.id] && c.ok(cur)) { cur.conq[c.id] = true; novas.push(c.nome); } });
+    if (novas.length) { toast('Conquista: ' + novas.join(', ')); som('raro'); vibrar([30, 40, 30]); }
+  }
+  function persist() { if (cur && slot >= 0) { checarConq(); gravar(slot, cur); } }
+
+  /* ---------- Regras ---------- */
+  function modo() { return MODOS[cur.mode]; }
+  function capacidade() { return CAP[cur.museu - 1]; }
+  function valorItem(k) { return ITENS[k] ? ITENS[k].valor : animal(k.slice(3)).valor; }
+  function nomeItem(k) { return ITENS[k] ? ITENS[k].nome : 'Esqueleto de ' + animal(k.slice(3)).nome; }
+  function iconeItem(k) { return ITENS[k] ? ITENS[k].icon : 'esqueleto'; }
+  function curtoItem(k) { return ITENS[k] ? ITENS[k].curto : animal(k.slice(3)).nome.split(/[ -]/)[0]; }
+  function estoque(k) { return ITENS[k] ? cur.itens[k] : (cur.esqueletos[k.slice(3)] || 0); }
+  function mexerEstoque(k, d) { if (ITENS[k]) cur.itens[k] += d; else { var id = k.slice(3); cur.esqueletos[id] = (cur.esqueletos[id] || 0) + d; } }
+  function renda() {
+    var t = 0;
+    for (var i = 0; i < cur.vitrines; i++) if (cur.expo[i]) t += valorItem(cur.expo[i]);
+    return Math.round(t * modo().rend);
+  }
+  function bonusPedido() { return Math.round(valorItem(cur.pedido.k) * 2 * modo().rend); }
+  function expostoNoPedido() {
+    for (var i = 0; i < cur.vitrines; i++) if (cur.expo[i] === cur.pedido.k) return true;
+    return false;
+  }
+  function custoVitrine() { return Math.round(12 * Math.pow(1.17, cur.vitrines - 3) * modo().custo); }
+  function custoEscavacao() { return Math.round(40 * Math.pow(1.9, cur.digMax - DIG_BASE) * modo().custo); }
+  function custoPesq() { return Math.round(120 * Math.pow(1.8, cur.pesq) * modo().custo); }
+  function custoSeg() { return Math.round(100 * Math.pow(1.9, cur.seg) * modo().custo); }
+  function chanceRoubo() { return Math.max(0.02, 0.25 * (1 - 0.18 * cur.seg)); }
+  function podeExpandir() { return cur.museu < CAP.length && cur.vitrines >= capacidade(); }
+  function qtd(min, max, mult) {
+    var b = min + Math.floor(Math.random() * (max - min + 1));
+    return Math.max(1, Math.round(b * mult));
+  }
+
+  // Um achado comum (usado na escavação normal e pelos pesquisadores).
+  function achado() {
+    var g = modo().ganho;
+    if (Math.random() < 0.22) {
+      var rk = pick(['escaravelho', 'escaravelho', 'anfora', 'anfora', 'anfora']), rn = qtd(1, 2, g);
+      cur.itens[rk] += rn;
+      return { t: 'reliq', n: rn, raro: false, txt: 'Você desenterrou uma relíquia: ' + ITENS[rk].nome + (rn > 1 ? ' (x' + rn + ')' : '') + '.' };
+    }
+    if (Math.random() < 0.4) {
+      if (Math.random() < 0.12) {
+        cur.itens.inseto++; cur.stats.raros++;
+        return { t: 'inseto', n: 1, raro: true, txt: 'Que sorte! Um âmbar com um inseto preso dentro.' };
+      }
+      var n = qtd(1, 3, g); cur.itens.amber += n;
+      return { t: 'amber', n: n, raro: false, txt: 'Você achou ' + n + (n > 1 ? ' peças de âmbar.' : ' peça de âmbar.') };
+    }
+    var a = pick(ANIMAIS), m = qtd(3, 8, g);
+    cur.fosseis[a.id] = (cur.fosseis[a.id] || 0) + m;
+    var txt = 'Você achou ' + m + (m > 1 ? ' fósseis' : ' fóssil') + ' de ' + a.nome + '. Total: ' + cur.fosseis[a.id] + '/' + FOSSEIS_ESQ + '.', raro = false;
+    if (Math.random() < 0.07) { cur.itens.ouro++; cur.stats.raros++; txt += ' E um fóssil dourado no meio da areia!'; raro = true; }
+    return { t: 'fossil', n: m, raro: raro, txt: txt };
+  }
+
+  // Achado comum de neve e pântano: relíquias ou bichos do bioma.
+  function achadoBioma(b) {
+    if (b === 'deserto') return achado();
+    var T = BIOMAS[b], n = qtd(1, 2, modo().ganho);
+    var relic = Math.random() < 0.55;
+    var k = pick(relic ? T.reliquias : T.bichos);
+    cur.itens[k] += n;
+    var sl = ITENS[k].sala;
+    var txt = 'Você achou ' + (relic ? 'uma relíquia: ' : 'um bicho: ') + ITENS[k].nome + (n > 1 ? ' (x' + n + ')' : '') + '.';
+    if (sl && !cur.salas[sl]) txt += ' Para expor, você precisa da ' + SALAS[sl].nome + '.';
+    return { t: relic ? 'reliq' : 'bicho', n: n, raro: false, txt: txt };
+  }
+
+  function cavar() {
+    if (cur.digsLeft <= 0) return;
+    cur.digsLeft--; cur.stats.cavadas++; cur.tempestade = false; cur.eb = 'Último achado';
+    som('cava'); vibrar(20);
+    var m = modo(), r = Math.random(), txt, tipo = 'achado';
+    if (cur.mapa) {
+      cur.mapa = false; tipo = 'raro'; cur.eb = 'Mapa do tesouro';
+      if (Math.random() < 0.5) {
+        var k = pick(cur.bioma === 'deserto' ? RAROS_SORTEIO : BIOMAS[cur.bioma].raros); cur.itens[k]++; cur.stats.raros++;
+        txt = 'O mapa levou ao tesouro: ' + ITENS[k].nome + '!';
+      } else if (cur.bioma !== 'deserto') {
+        var kk = pick(BIOMAS[cur.bioma].reliquias.concat(BIOMAS[cur.bioma].bichos)), nn = qtd(4, 6, m.ganho);
+        cur.itens[kk] += nn;
+        txt = 'O mapa levou a um sítio cheio: ' + nn + ' × ' + ITENS[kk].nome + '.';
+      } else {
+        var a = pick(ANIMAIS), n = qtd(12, 20, m.ganho);
+        cur.fosseis[a.id] = (cur.fosseis[a.id] || 0) + n;
+        txt = 'O mapa levou a um sítio cheio: ' + n + ' fósseis de ' + a.nome + '. Total: ' + cur.fosseis[a.id] + '/' + FOSSEIS_ESQ + '.';
+      }
+    } else if (r < m.storm) {
+      cur.tempestade = true; cur.stats.tempestades++; cur.eb = 'Tempestade de areia'; tipo = 'tempestade';
+      var extra = 0; if (cur.digsLeft > 0) { cur.digsLeft--; extra = 1; }
+      txt = 'Uma tempestade de areia cobriu o buraco. Esta escavação foi perdida' + (extra ? ' e mais uma também.' : '.');
+    } else if (r < m.storm + 0.05) {
+      var k2 = pick(BIOMAS[cur.bioma].raros);
+      cur.itens[k2]++; cur.stats.raros++; cur.eb = 'Achado raro'; tipo = 'raro';
+      txt = 'Achado raro! Você desenterrou: ' + ITENS[k2].nome + '.';
+      if (ITENS[k2].sala && !cur.salas[ITENS[k2].sala]) txt += ' Para expor, você precisa da ' + SALAS[ITENS[k2].sala].nome + '.';
+    } else if (r < m.storm + 0.10) {
+      cur.mapa = true; cur.eb = 'Mapa do tesouro'; tipo = 'raro';
+      txt = 'Você achou um mapa do tesouro. A próxima escavação está garantida e rende bem mais.';
+    } else {
+      var x = achadoBioma(cur.bioma); txt = x.txt;
+      if (x.raro) { tipo = 'raro'; cur.eb = 'Achado raro'; }
+    }
+    if (cur.digsLeft === 0) txt += ' Anoiteceu, hoje não dá mais para cavar.';
+    cur.ultimo = txt;
+    som(tipo);
+    if (tipo === 'raro') vibrar([30, 40, 30]); else if (tipo === 'tempestade') vibrar(120);
+    persist(); renderAll();
+  }
+
+  function encerrarDia() {
+    var partes = [], roubo = false;
+    cur.tempestade = false;
+    if (modo().ladrao && Math.random() < chanceRoubo()) {
+      var idx = []; for (var i = 0; i < cur.vitrines; i++) if (cur.expo[i]) idx.push(i);
+      if (idx.length) {
+        var j = pick(idx), kk = cur.expo[j]; cur.expo[j] = null; roubo = true;
+        partes.push('Um ladrão levou ' + nomeItem(kk) + ' da vitrine ' + (j + 1) + '.');
+      }
+    }
+    if (cur.pesq > 0) {
+      var am = 0, fo = 0, ra = 0, re = 0;
+      for (var p = 0; p < cur.pesq; p++) {
+        var x = achado();
+        if (x.t === 'amber') am += x.n; else if (x.t === 'fossil') fo += x.n; else if (x.t === 'reliq') re += x.n;
+        if (x.raro) ra++;
+      }
+      var s = [];
+      if (am) s.push(am + ' de âmbar'); if (re) s.push(re + ' relíquias'); if (fo) s.push(fo + ' fósseis'); if (ra) s.push(ra + (ra > 1 ? ' peças raras' : ' peça rara'));
+      partes.push('Os pesquisadores acharam ' + (s.length ? s.join(', ') : 'nada') + '.');
+    }
+    var bonus = 0, ped = cur.pedido.v;
+    if (expostoNoPedido()) {
+      bonus = bonusPedido(); cur.stats.pedidos++;
+      ped += ' viu ' + nomeItem(cur.pedido.k) + ' e pagou mais ' + fmt(bonus) + ' moedas.';
+    } else {
+      ped += ' queria ver ' + nomeItem(cur.pedido.k) + ' e foi embora sem ver.';
+    }
+    var r = renda() + bonus;
+    cur.moedas += r; cur.dia++; cur.digsLeft = cur.digMax; cur.pedido = novoPedido(cur.salas); cur.mercado = novoMercado();
+    cur.eb = roubo ? 'Roubo no museu' : 'Novo dia';
+    cur.ultimo = 'Amanheceu no dia ' + cur.dia + '. Os visitantes deixaram ' + fmt(r) + ' moedas. ' + partes.join(' ') + (partes.length ? ' ' : '') + ped;
+    if (roubo) { som('erro'); vibrar([80, 50, 80]); } else som('moeda');
+    persist(); renderAll();
+  }
+
+  function montar(id) {
+    if ((cur.fosseis[id] || 0) < FOSSEIS_ESQ) return;
+    cur.fosseis[id] -= FOSSEIS_ESQ;
+    cur.esqueletos[id] = (cur.esqueletos[id] || 0) + 1;
+    cur.stats.esqueletos++; cur.animais[id] = true;
+    cur.eb = 'Esqueleto montado';
+    cur.ultimo = 'Esqueleto de ' + animal(id).nome + ' montado. Coloque numa vitrine.';
+    som('raro'); vibrar([30, 40, 30]);
+    persist(); renderAll();
+  }
+  function colocar(i, k) {
+    if (estoque(k) < 1) return;
+    if (ITENS[k] && ITENS[k].sala && !cur.salas[ITENS[k].sala]) return;
+    mexerEstoque(k, -1); cur.expo[i] = k; som('achado'); persist(); renderAll();
+  }
+  function remover(i) {
+    var k = cur.expo[i]; if (!k) return;
+    mexerEstoque(k, 1); cur.expo[i] = null; persist(); renderAll();
+  }
+  function precoVenda(k) { return Math.max(1, Math.round(BASE_VENDA[k] * cur.mercado[k] * modo().rend)); }
+  function venderItem(k, n) {
+    n = Math.min(n, cur.itens[k]); if (n < 1) return;
+    cur.itens[k] -= n; cur.moedas += n * precoVenda(k);
+    som('moeda'); vibrar(25); persist(); renderAll();
+  }
+  function venderFossil(id, n) {
+    n = Math.min(n, cur.fosseis[id] || 0); if (n < 1) return;
+    cur.fosseis[id] -= n; cur.moedas += n * precoVenda('fossil');
+    som('moeda'); vibrar(25); persist(); renderAll();
+  }
+  function comprar(custo, fn) {
+    if (cur.moedas < custo) { som('erro'); return; }
+    cur.moedas -= custo; fn(); som('moeda'); vibrar(25); persist(); renderAll();
+  }
+  function comprarVitrine() { if (cur.vitrines >= capacidade()) return; comprar(custoVitrine(), function () { cur.vitrines++; }); }
+  function comprarEscavacao() { if (cur.digMax >= DIG_MAX) return; comprar(custoEscavacao(), function () { cur.digMax++; cur.digsLeft++; }); }
+  function comprarPesq() { if (cur.pesq >= PESQ_MAX) return; comprar(custoPesq(), function () { cur.pesq++; }); }
+  function comprarSeg() { if (cur.seg >= SEG_MAX) return; comprar(custoSeg(), function () { cur.seg++; }); }
+  function custoSala(id) { return Math.round(SALAS[id].custo * modo().custo); }
+  function comprarSala(id) { if (cur.salas[id]) return; comprar(custoSala(id), function () { cur.salas[id] = true; }); }
+
+  /* ---------- Folha de ações ---------- */
+  function sheet(o) {
+    $('#sh-eyebrow').textContent = o.eyebrow || '';
+    $('#sh-title').textContent = o.title;
+    $('#sh-body').innerHTML = o.body || '';
+    var box = $('#sh-actions'); box.innerHTML = '';
+    (o.actions || []).forEach(function (x) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn ' + (x.cls || 'ghost');
+      b.textContent = x.label;
+      if (x.off) b.disabled = true;
+      b.addEventListener('click', function () { closeSheet(); if (x.fn) x.fn(); });
+      box.appendChild(b);
+    });
+    $('#sheet').hidden = false;
+  }
+  function closeSheet() { $('#sheet').hidden = true; }
+  $('#sheet').addEventListener('click', function (e) { if (e.target === $('#sheet')) closeSheet(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+
+  /* ---------- Navegação ---------- */
+  function show(name) {
+    $$('main > .screen').forEach(function (s) { s.hidden = true; });
+    $('#s-' + name).hidden = false;
+    document.body.classList.toggle('ingame', name === 'game');
+    $('#tabs').hidden = name !== 'game';
+    if (name === 'saves') renderSlots();
+    if (name === 'settings') renderCfg();
+    window.scrollTo(0, 0);
+  }
+  $$('[data-go]').forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.go); }); });
+
+  var ABAS = ['deserto', 'museu', 'melhorias', 'conquistas'];
+  function tab(n) {
+    ABAS.forEach(function (t) { $('#v-' + t).hidden = t !== n; });
+    $$('.tab').forEach(function (b) { b.setAttribute('aria-current', b.dataset.tab === n ? 'page' : 'false'); });
+    window.scrollTo(0, 0);
+  }
+  $$('.tab').forEach(function (b) { b.addEventListener('click', function () { tab(b.dataset.tab); }); });
+
+  /* ---------- Saves: tela ---------- */
+  function renderSlots() {
+    var box = $('#slots'); box.innerHTML = '';
+    for (var i = 0; i < 3; i++) (function (i) {
+      var s = ler(i);
+      var el = document.createElement('div');
+      el.className = 'panel slot' + (s ? ' brass' : '');
+      if (s) {
+        var m = MODOS[s.mode];
+        el.innerHTML = '<div class="slot-head"><h3>Save ' + (i + 1) + '</h3><span class="chip ' + s.mode + '">' + m.nome + '</span></div>' +
+          '<p class="muted">Museu ' + s.museu + ' · Dia ' + s.dia + ' · ' + fmt(s.moedas) + ' moedas</p>' +
+          '<div class="slot-actions"></div>';
+        var a = $('.slot-actions', el);
+        var c = document.createElement('button'); c.type = 'button'; c.className = 'btn primary'; c.textContent = 'Continuar';
+        c.addEventListener('click', function () { entrar(i); });
+        var d = document.createElement('button'); d.type = 'button'; d.className = 'btn ghost'; d.textContent = 'Apagar';
+        d.addEventListener('click', function () {
+          sheet({ eyebrow: 'Save ' + (i + 1), title: 'Apagar este save?', body: '<p class="muted">O museu, as moedas e todos os itens deste save somem para sempre.</p>',
+            actions: [{ label: 'Apagar save', cls: 'primary', fn: function () { apagar(i); renderSlots(); } }, { label: 'Cancelar' }] });
+        });
+        a.appendChild(c); a.appendChild(d);
+      } else {
+        el.innerHTML = '<div class="slot-head"><h3>Save ' + (i + 1) + '</h3><span class="chip">Vazio</span></div><p class="muted">Nenhum museu aqui ainda.</p><div class="slot-actions"></div>';
+        var n = document.createElement('button'); n.type = 'button'; n.className = 'btn primary'; n.textContent = 'Novo jogo';
+        n.addEventListener('click', function () { escolherModo(i); });
+        $('.slot-actions', el).appendChild(n);
+      }
+      box.appendChild(el);
+    })(i);
+    $('#store-warn').hidden = storageOk;
+  }
+  function escolherModo(i) {
+    var body = '<ul>' + Object.keys(MODOS).map(function (k) { return '<li><b>' + MODOS[k].nome + '.</b> ' + MODOS[k].desc + '</li>'; }).join('') + '</ul>';
+    var acts = Object.keys(MODOS).map(function (k) {
+      return { label: MODOS[k].nome, cls: k === 'classico' ? 'primary' : 'ghost', fn: function () { gravar(i, novoSave(k)); entrar(i); } };
+    });
+    acts.push({ label: 'Cancelar' });
+    sheet({ eyebrow: 'Save ' + (i + 1), title: 'Escolha o modo', body: body, actions: acts });
+  }
+  function entrar(i) {
+    var s = ler(i);
+    if (!s) return;
+    slot = i; cur = migrar(s);
+    show('game'); tab('deserto'); renderAll();
+    persist();
+  }
+  $('#exit').addEventListener('click', function () { persist(); cur = null; slot = -1; show('saves'); });
+  $('#wipe').addEventListener('click', function () {
+    sheet({ eyebrow: 'Configurações', title: 'Apagar todos os saves?', body: '<p class="muted">Os 3 saves somem para sempre.</p>',
+      actions: [{ label: 'Apagar tudo', cls: 'primary', fn: function () { for (var i = 0; i < 3; i++) apagar(i); } }, { label: 'Cancelar' }] });
+  });
+
+  /* ---------- Render do jogo ---------- */
+  function renderAll() { renderHud(); renderDesert(); renderMuseu(); renderLoja(); renderMelhorias(); renderConq(); }
+
+  function renderLoja() {
+    var box = $('#loja'); box.innerHTML = ''; var n = 0;
+    function tag(k) {
+      var m = cur.mercado[k];
+      return m > 1 ? '<span class="chip dificil">Em alta</span>' : (m < 1 ? '<span class="chip hell">Em baixa</span>' : '<span class="chip">Normal</span>');
+    }
+    function btn(label, fn) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn ghost small'; b.textContent = label;
+      b.addEventListener('click', fn); return b;
+    }
+    function linha(ico, nome, qtd, k, botoes) {
+      var r = document.createElement('div'); r.className = 'inv-row';
+      r.innerHTML = '<div class="inv-ico">' + icon(ico) + '</div><div class="inv-main"><b>' + nome + '</b><small>' + qtd + ' · ' + fmt(precoVenda(k)) + ' moedas cada</small><span>' + tag(k) + '</span></div>';
+      var w = document.createElement('div'); w.style.cssText = 'display:flex;flex-direction:column;gap:6px';
+      botoes.forEach(function (b) { w.appendChild(b); });
+      r.appendChild(w); box.appendChild(r); n++;
+    }
+    ORDEM_ITENS.forEach(function (k) {
+      var q = cur.itens[k]; if (q < 1) return;
+      var bs = [btn('Vender 1', function () { venderItem(k, 1); })];
+      if (q > 1) bs.push(btn('Vender tudo', function () { venderItem(k, q); }));
+      linha(ITENS[k].icon, ITENS[k].nome, q + ' na mochila', k, bs);
+    });
+    ANIMAIS.forEach(function (a) {
+      var q = cur.fosseis[a.id] || 0; if (q < 1) return;
+      var bs = [btn('Vender 1', function () { venderFossil(a.id, 1); })];
+      if (q > 1) bs.push(btn(q >= 10 ? 'Vender 10' : 'Vender tudo', function () { venderFossil(a.id, 10); }));
+      linha('fossil', 'Fósseis de ' + a.nome, q + ' no depósito', 'fossil', bs);
+    });
+    if (!n) box.innerHTML = '<p class="muted">Nada para vender agora. Fósseis, âmbar e peças raras que você achar aparecem aqui. Itens expostos em vitrine não entram.</p>';
+  }
+
+  function renderHud() {
+    var m = $('#hud-mode'); m.textContent = modo().nome; m.className = 'chip ' + cur.mode;
+    $('#hud-museu').textContent = 'Museu ' + cur.museu;
+    $('#hud-dia').textContent = cur.dia;
+    $('#hud-moedas').textContent = fmt(cur.moedas);
+    $('#hud-renda').textContent = fmt(renda());
+  }
+  function renderDesert() {
+    var noite = cur.digsLeft <= 0;
+    $('#scene').dataset.noite = noite ? 'true' : 'false';
+    $('#scene').dataset.storm = cur.tempestade ? 'true' : 'false';
+    $('#scene').dataset.bioma = cur.bioma;
+    $$('#biomas .sw').forEach(function (b) { b.setAttribute('aria-checked', b.dataset.bioma === cur.bioma ? 'true' : 'false'); });
+    var p = ''; for (var i = 0; i < cur.digMax; i++) p += '<i class="' + (i < cur.digsLeft ? 'on' : '') + '"></i>';
+    $('#pips').innerHTML = p;
+    $('#dig-count').textContent = cur.digsLeft + ' de ' + cur.digMax;
+    $('#mapa-chip').hidden = !cur.mapa;
+    var b = $('#cavar'); b.disabled = noite; b.textContent = noite ? 'Anoiteceu' : (cur.mapa ? 'Cavar com o mapa' : 'Cavar');
+    $('#fim-dia').textContent = noite ? 'Esperar o amanhecer' : 'Encerrar o dia';
+    $('#fim-dia').className = 'btn ' + (noite ? 'primary' : 'ghost');
+    $('#achado-eb').textContent = cur.eb || 'Último achado';
+    $('#achado-txt').textContent = cur.ultimo;
+  }
+  function renderMuseu() {
+    var ped = $('#pedido'), ok = expostoNoPedido();
+    ped.innerHTML = '<p class="eyebrow">Pedido do visitante</p><p><b>' + cur.pedido.v + '</b> quer ver: ' + nomeItem(cur.pedido.k) + '.</p>' +
+      '<p class="muted">Paga mais ' + fmt(bonusPedido()) + ' moedas se a peça estiver exposta ao encerrar o dia. ' + (ok ? 'Já está exposta.' : 'Ainda não está exposta.') + '</p>';
+
+    var cap = capacidade();
+    $('#vit-count').textContent = cur.vitrines + '/' + cap;
+    var g = $('#vit-grid'); g.innerHTML = '';
+    for (var i = 0; i < cap; i++) (function (i) {
+      var b = document.createElement('button'); b.type = 'button';
+      var k = cur.expo[i];
+      if (i >= cur.vitrines) {
+        b.className = 'vit trava' + (i === cur.vitrines ? ' prox' : '');
+        b.innerHTML = icon('cadeado'); b.setAttribute('aria-label', 'Vitrine ' + (i + 1) + ' bloqueada');
+      } else if (k) {
+        b.className = 'vit cheio' + (ITENS[k] && ITENS[k].raro ? ' raro' : '');
+        var lab = curtoItem(k);
+        b.innerHTML = icon(iconeItem(k)) + (lab ? '<span class="lab">' + lab + '</span>' : '');
+        b.setAttribute('aria-label', 'Vitrine ' + (i + 1) + ': ' + nomeItem(k));
+      } else {
+        b.className = 'vit vazio'; b.textContent = '+'; b.setAttribute('aria-label', 'Vitrine ' + (i + 1) + ' vazia');
+      }
+      b.addEventListener('click', function () { clicarVitrine(i); });
+      g.appendChild(b);
+    })(i);
+
+    var d = $('#deposito'); d.innerHTML = '';
+    function row(ico, nome, sub, extra, btn) {
+      var r = document.createElement('div'); r.className = 'inv-row';
+      r.innerHTML = '<div class="inv-ico">' + icon(ico) + '</div><div class="inv-main"><b>' + nome + '</b><small>' + sub + '</small>' + (extra || '') + '</div>';
+      r.appendChild(btn || document.createElement('span'));
+      d.appendChild(r);
+    }
+    function mini(label, fn, off) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn ghost small'; b.textContent = label;
+      b.disabled = !!off; b.addEventListener('click', fn); return b;
+    }
+    ORDEM_ITENS.forEach(function (k) {
+      var n = cur.itens[k];
+      if (k !== 'amber' && n < 1) return;
+      if (k === 'amber') row('ambar', 'Âmbar', n + ' na mochila · rende ' + fmt(ITENS.amber.valor * modo().rend) + '/dia', '', null);
+      else row(ITENS[k].icon, ITENS[k].nome, n + ' na mochila · rende ' + fmt(ITENS[k].valor * modo().rend) + '/dia' + (ITENS[k].sala && !cur.salas[ITENS[k].sala] ? ' · precisa da ' + SALAS[ITENS[k].sala].nome : ''), '', null);
+    });
+    ANIMAIS.forEach(function (a) {
+      var f = cur.fosseis[a.id] || 0, e = cur.esqueletos[a.id] || 0;
+      var pct = Math.min(100, Math.round(f / FOSSEIS_ESQ * 100));
+      row('fossil', a.nome, f + '/' + FOSSEIS_ESQ + ' fósseis' + (e ? ' · ' + e + (e > 1 ? ' esqueletos prontos' : ' esqueleto pronto') : ''),
+        '<div class="bar"><i style="width:' + pct + '%"></i></div>', mini('Montar', function () { montar(a.id); }, f < FOSSEIS_ESQ));
+    });
+  }
+  function clicarVitrine(i) {
+    var k = cur.expo[i];
+    if (i >= cur.vitrines) {
+      if (i === cur.vitrines) {
+        var c = custoVitrine();
+        sheet({ eyebrow: 'Vitrine ' + (i + 1), title: 'Desbloquear vitrine', body: '<p class="muted">Custa ' + fmt(c) + ' moedas. Você tem ' + fmt(cur.moedas) + '.</p>',
+          actions: [{ label: 'Comprar por ' + fmt(c), cls: 'primary', off: cur.moedas < c, fn: comprarVitrine }, { label: 'Fechar' }] });
+      } else {
+        sheet({ eyebrow: 'Vitrine ' + (i + 1), title: 'Bloqueada', body: '<p class="muted">Desbloqueie as vitrines anteriores primeiro.</p>', actions: [{ label: 'Fechar' }] });
+      }
+      return;
+    }
+    if (k) {
+      sheet({ eyebrow: 'Vitrine ' + (i + 1), title: nomeItem(k), body: '<p class="muted">Rende ' + fmt(valorItem(k) * modo().rend) + ' moedas por dia.</p>',
+        actions: [{ label: 'Tirar da vitrine', fn: function () { remover(i); } }, { label: 'Fechar' }] });
+      return;
+    }
+    var acts = [];
+    ORDEM_ITENS.forEach(function (key) {
+      if (cur.itens[key] < 1) return;
+      var sl = ITENS[key].sala, falta = sl && !cur.salas[sl];
+      acts.push({ label: nomeItem(key) + ' (' + cur.itens[key] + ')' + (falta ? ' · precisa da ' + SALAS[sl].nome : ' · ' + fmt(valorItem(key) * modo().rend) + '/dia'), cls: 'primary', off: !!falta, fn: function () { colocar(i, key); } });
+    });
+    ANIMAIS.forEach(function (a) {
+      var n = cur.esqueletos[a.id] || 0;
+      if (n > 0) acts.push({ label: 'Esqueleto de ' + a.nome + ' (' + n + ') · ' + fmt(a.valor * modo().rend) + '/dia', cls: 'primary', fn: function () { colocar(i, 'sk:' + a.id); } });
+    });
+    var vazio = acts.length === 0;
+    acts.push({ label: 'Fechar' });
+    sheet({ eyebrow: 'Vitrine ' + (i + 1), title: 'Expor um item',
+      body: vazio ? '<p class="muted">Nenhum item para expor. Cave no deserto e monte esqueletos com 40 fósseis.</p>' : '', actions: acts });
+  }
+
+  function renderMelhorias() {
+    var box = $('#ups'); box.innerHTML = '';
+    function card(t, desc, costTxt, btnTxt, off, fn) {
+      var el = document.createElement('div'); el.className = 'panel up';
+      el.innerHTML = '<div class="up-head"><h3>' + t + '</h3><span class="up-cost">' + costTxt + '</span></div><p class="muted">' + desc + '</p>';
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn primary'; b.textContent = btnTxt; b.disabled = off;
+      b.addEventListener('click', fn); el.appendChild(b); box.appendChild(el);
+    }
+    var cap = capacidade();
+    if (cur.vitrines < cap) {
+      var c1 = custoVitrine();
+      card('Nova vitrine', 'Abre a vitrine ' + (cur.vitrines + 1) + ' de ' + cap + '. Mais espaço para expor itens.', fmt(c1) + ' moedas', 'Comprar vitrine', cur.moedas < c1, comprarVitrine);
+    } else {
+      card('Vitrines', 'Todas as ' + cap + ' vitrines deste museu estão abertas.', 'Completo', 'Nada a comprar', true, function () {});
+    }
+    if (cur.digMax < DIG_MAX) {
+      var c2 = custoEscavacao();
+      card('Mais escavações', 'Sobe de ' + cur.digMax + ' para ' + (cur.digMax + 1) + ' escavações por dia. O máximo é ' + DIG_MAX + '.', fmt(c2) + ' moedas', 'Comprar escavação', cur.moedas < c2, comprarEscavacao);
+    } else {
+      card('Escavações', 'Você chegou ao máximo de ' + DIG_MAX + ' escavações por dia.', 'Máximo', 'Nada a comprar', true, function () {});
+    }
+    if (cur.pesq < PESQ_MAX) {
+      var c3 = custoPesq();
+      card('Pesquisadores', 'Cada pesquisador escava 1 vez sozinho quando você encerra o dia. Você tem ' + cur.pesq + ' de ' + PESQ_MAX + '.', fmt(c3) + ' moedas', 'Contratar pesquisador', cur.moedas < c3, comprarPesq);
+    } else {
+      card('Pesquisadores', 'Sua equipe está completa, com ' + PESQ_MAX + ' pesquisadores.', 'Completo', 'Nada a comprar', true, function () {});
+    }
+    Object.keys(SALAS).forEach(function (id) {
+      var S = SALAS[id];
+      if (cur.salas[id]) {
+        card(S.nome, 'Construída. Os itens do bioma ' + S.bioma + ' já podem ficar nas vitrines.', 'Pronta', 'Já construída', true, function () {});
+      } else {
+        var cs = custoSala(id);
+        card(S.nome, 'Necessária para expor nas vitrines as relíquias e os bichos do bioma ' + S.bioma + '. Sem ela, esses itens ficam na mochila.', fmt(cs) + ' moedas', 'Construir sala', cur.moedas < cs, function () { comprarSala(id); });
+      }
+    });
+    if (modo().ladrao) {
+      var pc = Math.round(chanceRoubo() * 100);
+      if (cur.seg < SEG_MAX) {
+        var c4 = custoSeg();
+        card('Segurança', 'Diminui a chance de um ladrão levar uma peça à noite. Nível ' + cur.seg + ' de ' + SEG_MAX + '. Risco atual: ' + pc + '% por noite.', fmt(c4) + ' moedas', 'Reforçar segurança', cur.moedas < c4, comprarSeg);
+      } else {
+        card('Segurança', 'Segurança no nível máximo. Risco atual: ' + pc + '% por noite.', 'Máximo', 'Nada a comprar', true, function () {});
+      }
+    }
+    if (cur.museu < CAP.length) {
+      card('Novo museu', 'Muda para um museu com ' + CAP[cur.museu] + ' vitrines. Você perde tudo (moedas, itens, vitrines e melhorias), leva só 1 item e começa com 1 vitrine. Exige as ' + cap + ' vitrines abertas.',
+        cur.vitrines >= cap ? 'Liberado' : cur.vitrines + '/' + cap, 'Expandir o museu', !podeExpandir(), expandir);
+    } else {
+      card('Novo museu', 'Este é o maior museu da versão beta.', 'Máximo', 'Sem expansão', true, function () {});
+    }
+  }
+
+  function renderConq() {
+    var box = $('#conq'); box.innerHTML = ''; var n = 0;
+    CONQ.forEach(function (c) {
+      var ok = !!cur.conq[c.id]; if (ok) n++;
+      var r = document.createElement('div'); r.className = 'inv-row conq' + (ok ? ' ok' : '');
+      r.innerHTML = '<div class="inv-ico">' + icon('trofeu') + '</div><div class="inv-main"><b>' + c.nome + '</b><small>' + c.desc + '</small></div><span class="chip' + (ok ? ' dificil' : '') + '">' + (ok ? 'Feito' : 'Falta') + '</span>';
+      box.appendChild(r);
+    });
+    $('#conq-count').textContent = n + '/' + CONQ.length;
+  }
+
+  function expandir() {
+    if (!podeExpandir()) return;
+    var keys = [], seen = {};
+    function add(k) { if (ITENS[k] && ITENS[k].sala) return; if (!seen[k]) { seen[k] = 1; keys.push(k); } }
+    cur.expo.forEach(function (k) { if (k) add(k); });
+    ORDEM_ITENS.forEach(function (k) { if (cur.itens[k] > 0) add(k); });
+    Object.keys(cur.esqueletos).forEach(function (id) { if (cur.esqueletos[id] > 0) add('sk:' + id); });
+    var acts = keys.map(function (k) { return { label: nomeItem(k), fn: function () { confirmarExpansao(k); } }; });
+    if (!keys.length) acts.push({ label: 'Seguir sem nenhum item', fn: function () { confirmarExpansao(null); } });
+    acts.push({ label: 'Cancelar' });
+    sheet({ eyebrow: 'Novo museu', title: 'Qual item você leva?',
+      body: '<p class="muted">Só 1 item atravessa para o museu de ' + CAP[cur.museu] + ' vitrines. Todo o resto é perdido.</p>', actions: acts });
+  }
+  function confirmarExpansao(k) {
+    sheet({ eyebrow: 'Novo museu', title: 'Perder tudo e mudar?',
+      body: '<p class="muted">Você leva: ' + (k ? nomeItem(k) : 'nada') + '. Moedas, depósito, vitrines, salas, pesquisadores, segurança e melhorias voltam ao começo. Isso não dá para desfazer.</p>',
+      actions: [{ label: 'Sim, mudar de museu', cls: 'primary', fn: function () {
+        var novo = cur.museu + 1, exp = [];
+        for (var i = 0; i < CAP[novo - 1]; i++) exp.push(null);
+        exp[0] = k;
+        cur.museu = novo; cur.vitrines = 1; cur.moedas = 0; cur.digMax = DIG_BASE; cur.digsLeft = DIG_BASE;
+        cur.itens = {}; ORDEM_ITENS.forEach(function (key) { cur.itens[key] = 0; });
+        cur.salas = { gelada: false, camara: false }; cur.bioma = 'deserto';
+        cur.fosseis = {}; cur.esqueletos = {}; cur.expo = exp;
+        cur.pesq = 0; cur.seg = 0; cur.mapa = false; cur.tempestade = false; cur.pedido = novoPedido(cur.salas);
+        cur.eb = 'Novo museu';
+        cur.ultimo = 'Bem-vindo ao museu ' + novo + ', com ' + CAP[novo - 1] + ' vitrines. Você começa com 1 aberta.';
+        som('raro'); persist(); renderAll(); tab('museu');
+      } }, { label: 'Voltar' }] });
+  }
+
+  $$('#biomas .sw').forEach(function (b) {
+    b.addEventListener('click', function () { if (!cur) return; cur.bioma = b.dataset.bioma; persist(); renderDesert(); });
+  });
+  $('#cavar').addEventListener('click', cavar);
+  $('#fim-dia').addEventListener('click', encerrarDia);
+
+  renderCfg();
+  show('title');
+})();
+</script>
+
+</body></html>
