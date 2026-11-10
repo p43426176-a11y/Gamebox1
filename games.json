@@ -29,9 +29,9 @@
       "title": "Museu do Grok",
       "category": "Aventura",
       "version": "1.0",
-      "description": "Explore um museu, descubra dinossauros, objetos antigos e relíquias históricas. Conheça também a história de Carlos Eduardo!",
+      "description": "Explore um museu, descubra dinossauros, objetos antigos e relíquias históricas. Conheça também Carlos Eduardo!",
       "emoji": "🦖",
-      "url": "games/Museugrok/index.html"
+      "url": "games/Museugrok/index.html",
       "mode": "html",
       "createdAt": "2026-11-10"
     }
