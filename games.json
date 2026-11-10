@@ -11,6 +11,17 @@
       "url": "games/ants/index.html",
       "mode": "html",
       "createdAt": "2026-11-09"
+    },
+    {
+      "id": "andares",
+      "title": "Andares",
+      "category": "Aventura",
+      "version": "1.8 Beta",
+      "description": "Explore 50 andares, encontre minérios e enfrente monstros!",
+      "emoji": "⛏️",
+      "url": "games/andares/index.html",
+      "mode": "html",
+      "createdAt": "2026-11-09"
     }
   ]
 }
