@@ -49,13 +49,24 @@
     {
       "id": "roube-minerio",
       "title": "Roube um Minério",
-      "category": "Aventura",
+      "category": "Simulação",
       "version": "1.0",
-      "description": "Colete e roube minérios valiosos!",
+      "description": "Colete, conquiste e roube minérios valiosos!",
       "emoji": "💎",
       "url": "games/roube_um_minerio/index.html",
       "mode": "html",
       "createdAt": "2026-11-10"
+    },
+    {
+      "id": "mini-royale",
+      "title": "Mini Royale 2D",
+      "category": "Ação",
+      "version": "1.0",
+      "description": "Entre em uma batalha Royale 2D e lute para conquistar a vitória!",
+      "emoji": "🎮",
+      "url": "games/mini_royale/index.html",
+      "mode": "html",
+      "createdAt": "2026-11-11"
     }
   ]
 }
