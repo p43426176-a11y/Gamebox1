@@ -6,7 +6,7 @@
       "id": "ants",
       "title": "Ants",
       "category": "Aventura",
-      "version": "1.5",
+      "version": "2.0",
       "description": "Jogo de formiga",
       "emoji": "🐜",
       "url": "games/ants/index.html",
@@ -67,6 +67,17 @@
       "url": "games/mini_royale/index.html",
       "mode": "html",
       "createdAt": "2026-11-11"
+    },
+    {
+      "id": "city",
+      "title": "City",
+      "category": "Simulação",
+      "version": "1.5",
+      "description": "Construa e administre sua própria cidade!",
+      "emoji": "🏙️",
+      "url": "games/city/index.html",
+      "mode": "html",
+      "createdAt": "2026-11-12"
     }
   ]
 }
